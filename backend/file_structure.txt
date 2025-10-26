@@ -1,0 +1,15 @@
+backend/app/tools/
+├── __init__.py          # Tool exports
+├── base_tool.py         # Base class for all tools
+├── rag_tool.py          # RAG implementation
+├── memory_tool.py       # Memory management
+├── attachment_tool.py   # Document processing
+└── escalation_tool.py   # Escalation logic
+
+backend/app/services/
+├── cache_service.py     # Redis caching
+└── embedding_service.py # Embedding generation
+
+backend/app/models/
+├── memory.py           # Memory SQLAlchemy model
+└── schemas.py          # Pydantic schemas
