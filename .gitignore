@@ -1,0 +1,358 @@
+# ==============================================================================
+# Customer Support AI Agent - Git Ignore File
+# ==============================================================================
+
+# -----------------------------------------------------------------------------
+# Environment and Secrets
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.cert
+*.crt
+secrets/
+credentials/
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.virtualenv/
+backend/venv/
+backend/.venv/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# -----------------------------------------------------------------------------
+# Node.js / Frontend
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+frontend/dist/
+frontend/build/
+.next/
+out/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Testing
+frontend/coverage/
+.nyc_output/
+
+# Production builds
+*.production
+*.production.local
+
+# -----------------------------------------------------------------------------
+# Databases and Storage
+# -----------------------------------------------------------------------------
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+backend/data/*.db
+data/*.db
+
+# PostgreSQL
+*.sql
+*.dump
+*.backup
+
+# ChromaDB / Vector stores
+chroma_db/
+backend/data/chroma_db/
+chromadb/
+*.index
+*.bin
+
+# Redis
+dump.rdb
+redis.conf.local
+
+# File uploads
+uploads/
+backend/data/uploads/
+backend/uploads/
+temp/
+tmp/
+
+# -----------------------------------------------------------------------------
+# Logs and Monitoring
+# -----------------------------------------------------------------------------
+logs/
+*.log
+*.log.*
+backend/logs/
+frontend/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------------------------------------------------------
+# IDE and Editors
+# -----------------------------------------------------------------------------
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+.vim/
+Session.vim
+
+# Emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+.emacs.desktop.lock
+
+# MacOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+# Docker volumes (local development)
+docker/volumes/
+.docker/
+
+# Docker override files
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.prod.yml
+!docker-compose.dev.yml
+
+# -----------------------------------------------------------------------------
+# Testing and Quality
+# -----------------------------------------------------------------------------
+# Test outputs
+test-results/
+test-report.xml
+junit.xml
+.benchmarks/
+
+# Code coverage
+coverage/
+.coverage
+htmlcov/
+lcov.info
+*.gcov
+
+# Load testing
+artillery_report*.json
+k6_results/
+
+# -----------------------------------------------------------------------------
+# Build and Compilation
+# -----------------------------------------------------------------------------
+# General build outputs
+build/
+dist/
+out/
+target/
+bin/
+obj/
+
+# Webpack
+.webpack/
+webpack-stats.json
+
+# Vite
+frontend/.vite/
+
+# -----------------------------------------------------------------------------
+# Operating System Files
+# -----------------------------------------------------------------------------
+# Temporary files
+*.tmp
+*.temp
+*.cache
+~$*
+
+# Backup files
+*.bak
+*.backup
+*.old
+.backup/
+
+# -----------------------------------------------------------------------------
+# Project Specific
+# -----------------------------------------------------------------------------
+# Data directories (but keep structure)
+backend/data/*
+!backend/data/.gitkeep
+data/*
+!data/.gitkeep
+
+# Model files
+models/*.bin
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.pb
+*.safetensors
+
+# Configuration overrides
+config.local.yml
+settings.local.json
+*.local.config
+
+# Monitoring data
+prometheus_data/
+grafana_data/
+metrics/
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
+site/
+
+# Certificates (development)
+certs/
+ssl/
+
+# Seeds and fixtures (may contain sensitive data)
+seeds/*.json
+fixtures/*.json
+
+# -----------------------------------------------------------------------------
+# Miscellaneous
+# -----------------------------------------------------------------------------
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Other
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.notes
+TODO.md
+NOTES.md
+.scratch/
+
+# ==============================================================================
+# End of .gitignore
+# ==============================================================================
