@@ -1,3 +1,5 @@
+<img width="797" height="755" alt="image" src="https://github.com/user-attachments/assets/ef6c3735-4efe-4f0f-9581-abc2c2aa422b" />
+
 # 🤖 Customer Support AI Agent
 
 <div align="center">
