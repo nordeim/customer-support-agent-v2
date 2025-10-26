@@ -1,0 +1,58 @@
+"""
+Escalation tool for detecting when human intervention is needed.
+Analyzes conversation context to determine escalation requirements.
+"""
+import logging
+import re
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+
+from ..config import settings
+from .base_tool import BaseTool
+
+logger = logging.getLogger(__name__)
+
+# Escalation trigger keywords and phrases
+ESCALATION_KEYWORDS = {
+    "urgent": 1.0,
+    "emergency": 1.0,
+    "complaint": 0.9,
+    "angry": 0.9,
+    "frustrated": 0.8,
+    "disappointed": 0.8,
+    "unacceptable": 0.8,
+    "legal": 0.9,
+    "lawsuit": 1.0,
+    "lawyer": 0.9,
+    "sue": 0.9,
+    "refund": 0.7,
+    "compensation": 0.7,
+    "manager": 0.8,
+    "supervisor": 0.8,
+    "human": 0.7,
+    "speak to someone": 0.8,
+    "talk to a person": 0.8,
+    "not helping": 0.7,
+    "doesn't work": 0.6,
+    "broken": 0.6,
+    "critical": 0.9,
+    "immediate": 0.8,
+    "asap": 0.8,
+    "right now": 0.8
+}
+
+# Sentiment thresholds
+NEGATIVE_SENTIMENT_THRESHOLD = -0.5
+ESCALATION_CONFIDENCE_THRESHOLD = 0.7
+
+
+class EscalationTool(BaseTool):
+    """
+    Tool for detecting when a conversation should be escalated to human support.
+    Analyzes various signals including keywords, sentiment, and context.
+    """
+    
+    def __init__(self):
+        """Initialize escalation detection tool."""
+        super().__init__(
+            name="escalation_check
