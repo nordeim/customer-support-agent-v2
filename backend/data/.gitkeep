@@ -1,0 +1,5 @@
+# This directory stores application data
+# - SQLite database (development)
+# - ChromaDB vector store
+# - Uploaded files
+# Do not commit actual data files
