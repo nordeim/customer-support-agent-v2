@@ -1,0 +1,21 @@
+frontend/
+├── src/
+│   ├── components/         # React components
+│   ├── hooks/              # Custom React hooks
+│   ├── services/           # API and WebSocket services
+│   ├── contexts/           # React contexts
+│   ├── types/              # TypeScript definitions
+│   ├── utils/              # Utility functions
+│   ├── styles/             # CSS and styling
+│   ├── assets/             # Images and static files
+│   ├── App.tsx             # Main app component
+│   ├── main.tsx            # Entry point
+│   └── vite-env.d.ts       # Vite type definitions
+├── public/                 # Public assets
+├── package.json            # Dependencies
+├── tsconfig.json           # TypeScript config
+├── vite.config.ts          # Vite configuration
+├── tailwind.config.js      # Tailwind CSS config
+├── postcss.config.js       # PostCSS config
+├── .env.example           # Environment variables
+└── Dockerfile             # Docker configuration
