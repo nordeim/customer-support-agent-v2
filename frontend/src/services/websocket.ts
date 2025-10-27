@@ -1,7 +1,6 @@
 /**
  * WebSocket service for real-time communication
  */
-import { io, Socket } from 'socket.io-client';
 import { WebSocketMessage } from '../types';
 
 // Configuration
@@ -13,7 +12,7 @@ export type MessageHandler = (message: WebSocketMessage) => void;
 export type ConnectionHandler = (connected: boolean) => void;
 
 class WebSocketService {
-  private socket: Socket | null = null;
+  private socket: WebSocket | null = null;
   private sessionId: string | null = null;
   private messageHandlers: Set<MessageHandler> = new Set();
   private connectionHandlers: Set<ConnectionHandler> = new Set();
@@ -105,7 +104,7 @@ class WebSocketService {
     };
 
     try {
-      (this.socket as any).send(JSON.stringify(message));
+      this.socket.send(JSON.stringify(message));
       console.log('[WS] Sent:', type, data);
     } catch (error) {
       console.error('[WS] Failed to send message:', error);
@@ -141,8 +140,8 @@ class WebSocketService {
     }
 
     if (this.socket) {
-      if ((this.socket as any).readyState === WebSocket.OPEN) {
-        (this.socket as any).close();
+      if (this.socket.readyState === WebSocket.OPEN) {
+        this.socket.close();
       }
       this.socket = null;
     }
@@ -173,7 +172,7 @@ class WebSocketService {
    */
   isConnected(): boolean {
     return this.socket !== null && 
-           (this.socket as any).readyState === WebSocket.OPEN;
+           this.socket.readyState === WebSocket.OPEN;
   }
 
   // Private methods

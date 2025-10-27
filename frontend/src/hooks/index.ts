@@ -21,8 +21,3 @@ export type {
   FileWithStatus,
   UseFileUploadReturn 
 } from './useFileUpload';
-
-// Re-export for convenience
-export { default as useChat } from './useChat';
-export { default as useWebSocket } from './useWebSocket';
-export { default as useFileUpload } from './useFileUpload';

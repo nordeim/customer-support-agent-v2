@@ -10,6 +10,7 @@ import {
   Session,
   Message,
   Source,
+  User,
 } from '../types';
 
 // Configuration

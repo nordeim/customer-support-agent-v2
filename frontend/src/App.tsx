@@ -1,9 +1,8 @@
 /**
  * Main application component
  */
-import React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { Toaster } from 'react-hot-toast';
+import { ErrorBoundary } from 'react-error-boundary';
 import ChatInterface from './components/ChatInterface';
 import ErrorFallback from './components/ErrorFallback';
 
