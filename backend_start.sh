@@ -9,6 +9,12 @@ cp .env.example .env
 # 3. Run the application
 python -m app.main
 
+# alternate start:
+# check config settings:
+python -c "from app.config import settings; print(f'App: {settings.app_name}'); print(f'CORS: {settings.cors_origins}')"
+# launch the server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
 # 4. Test endpoints
 # Health check
 curl http://localhost:8000/health
