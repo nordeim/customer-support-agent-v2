@@ -45,6 +45,10 @@ awesome job so far! what we lack is an awesome frontend to interact with the use
 
 ---
 
+awesome job so far! please meticulous review the runtime error below, then think deeper and think harder to meticulously explore thoroughly and systematically how best to fix the error. then meticulously create an implementation plan, review and validate the plan before executing cautiously.
+
+---
+
 You will now proceed with a meticulous review of the provided `README.md` to create a comprehensive briefing document, `CLAUDE.md`, tailored for an AI coding agent.
 
 Phase 1: Request Analysis & Planning
