@@ -24,7 +24,7 @@ class WebSocketService {
    * Connect to WebSocket server
    */
   connect(sessionId: string): void {
-    if (this.socket?.connected && this.sessionId === sessionId) {
+    if (this.socket?.readyState === WebSocket.OPEN && this.sessionId === sessionId) {
       console.log('[WS] Already connected to session:', sessionId);
       return;
     }

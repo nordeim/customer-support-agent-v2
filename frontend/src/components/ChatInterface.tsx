@@ -251,7 +251,6 @@ export const ChatInterface: React.FC = () => {
           ) : (
             <MessageList
               messages={messages}
-              isLoading={isLoading}
               isTyping={otherTyping}
             />
           )}

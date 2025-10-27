@@ -1,12 +1,10 @@
 /**
  * Input area component for message composition
  */
-import React, { forwardRef, KeyboardEvent } from 'react';
+import { forwardRef, KeyboardEvent } from 'react';
 import {
   PaperAirplaneIcon,
   PaperClipIcon,
-  FaceSmileIcon,
-  MicrophoneIcon,
 } from '@heroicons/react/24/outline';
 
 interface InputAreaProps {

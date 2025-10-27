@@ -20,13 +20,11 @@ import TypingIndicator from './TypingIndicator';
 
 interface MessageListProps {
   messages: Message[];
-  isLoading?: boolean;
   isTyping?: boolean;
 }
 
 const MessageList: React.FC<MessageListProps> = ({
   messages,
-  isLoading,
   isTyping,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -101,33 +99,31 @@ const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
             {message.isStreaming ? (
               <div className="text-sm">{message.content}</div>
             ) : (
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                className={`prose max-w-none ${
-                  isUser ? 'prose-invert' : ''
-                }`}
-                components={{
-                  code({ node, inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || '');
-                    return !inline && match ? (
-                      <SyntaxHighlighter
-                        style={tomorrow}
-                        language={match[1]}
-                        PreTag="div"
-                        {...props}
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
-                    ) : (
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    );
-                  },
-                }}
-              >
-                {message.content}
-              </ReactMarkdown>
+              <div className={`prose max-w-none ${isUser ? 'prose-invert' : ''}`}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    code({ node, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return match ? (
+                        <SyntaxHighlighter
+                          style={tomorrow as any}
+                          language={match[1]}
+                          PreTag="div"
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </div>
             )}
 
             {/* Attachments */}

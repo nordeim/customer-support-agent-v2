@@ -1,10 +1,9 @@
 /**
  * API service for backend communication
  */
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import {
-  ApiResponse,
   ChatResponse,
   SessionResponse,
   Session,

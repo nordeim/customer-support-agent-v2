@@ -7,11 +7,9 @@ import toast from 'react-hot-toast';
 import api from '../services/api';
 import websocket from '../services/websocket';
 import {
-  Session,
   Message,
   ChatState,
   WebSocketMessage,
-  Attachment,
   EscalationInfo,
 } from '../types';
 
