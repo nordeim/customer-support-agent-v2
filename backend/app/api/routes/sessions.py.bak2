@@ -72,7 +72,7 @@ async def create_session(
         
         db.add(session)
         db.commit()
-        # Removed: db.refresh(session) - This is causing the error
+        db.refresh(session)
         
         # Initialize agent context
         context = agent.get_or_create_context(session_id)

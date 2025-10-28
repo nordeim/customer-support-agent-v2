@@ -7,115 +7,113 @@ $ python -m app.main
 * 'schema_extra' has been renamed to 'json_schema_extra'
   warnings.warn(message, UserWarning)
 <frozen runpy>:128: RuntimeWarning: 'app.main' found in sys.modules after import of package 'app', but prior to execution of 'app.main'; this may result in unpredictable behaviour
-INFO:     Started server process [420968]
+INFO:     Started server process [432073]
 INFO:     Waiting for application startup.
-2025-10-28 19:31:23,138 - app.main - INFO - ============================================================
-2025-10-28 19:31:23,138 - app.main - INFO - Starting Customer Support AI Agent v1.0.0
-2025-10-28 19:31:23,138 - app.main - INFO - Environment: Environment.DEVELOPMENT
-2025-10-28 19:31:23,138 - app.main - INFO - ============================================================
-2025-10-28 19:31:23,138 - app.main - INFO - Initializing database...
-2025-10-28 19:31:23,138 - app.database - INFO - Initializing database...
-2025-10-28 19:31:23,138 - app.database - INFO - Registered models:
-2025-10-28 19:31:23,138 - app.database - INFO - Tables to be created:
-2025-10-28 19:31:23,138 - app.database - INFO - Importing memory model...
-2025-10-28 19:31:23,138 - app.database - INFO - Found model class: Memory with table: memories
-2025-10-28 19:31:23,138 - app.database - INFO - Memory model imported successfully
-2025-10-28 19:31:23,138 - app.database - INFO - Importing session model...
-2025-10-28 19:31:23,138 - app.database - INFO - Found model class: Session with table: sessions
-2025-10-28 19:31:23,138 - app.database - INFO - Session model imported successfully
-2025-10-28 19:31:23,138 - app.database - INFO - Importing message model...
-2025-10-28 19:31:23,138 - app.database - INFO - Found model class: Message with table: messages
-2025-10-28 19:31:23,138 - app.database - INFO - Message model imported successfully
-2025-10-28 19:31:23,138 - app.database - INFO - Registered models:
-2025-10-28 19:31:23,139 - app.database - INFO - Tables to be created:
-2025-10-28 19:31:23,139 - app.database - INFO - Creating database tables...
-2025-10-28 19:31:23,139 - app.database - INFO - Database tables creation command executed
-2025-10-28 19:31:23,140 - app.database - INFO - Database tables created successfully: ['memories', 'messages', 'sessions']
-2025-10-28 19:31:23,140 - app.database - INFO - Database file exists: ./data/customer_support.db
-2025-10-28 19:31:23,140 - app.database - INFO - Database file size: 49152 bytes
-2025-10-28 19:31:23,140 - app.database - INFO - Tables in database: ['memories', 'messages', 'sessions']
-2025-10-28 19:31:23,141 - app.database - INFO - Table 'memories' columns: ['id', 'session_id', 'created_at', 'updated_at', 'last_accessed', 'content_type', 'content', 'metadata', 'importance', 'access_count']
-2025-10-28 19:31:23,141 - app.database - INFO - Table 'messages' columns: ['id', 'session_id', 'role', 'content', 'timestamp', 'metadata']
-2025-10-28 19:31:23,141 - app.database - INFO - Table 'sessions' columns: ['id', 'user_id', 'thread_id', 'created_at', 'updated_at', 'last_activity', 'status', 'escalated', 'escalation_ticket_id', 'metadata']
-2025-10-28 19:31:23,141 - app.main - INFO - Initializing cache service...
-2025-10-28 19:31:23,142 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 19:31:23,143 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 19:31:23,143 - app.main - INFO - ✓ Cache service connected
-2025-10-28 19:31:23,143 - app.main - INFO - Initializing AI agent...
-2025-10-28 19:31:23,143 - app.agents.chat_agent - INFO - Initializing agent tools...
-2025-10-28 19:31:23,143 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 19:31:23,143 - app.tools.rag_tool - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
-2025-10-28 19:31:23,144 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-10-28 19:31:26,191 - app.tools.rag_tool - INFO - Embedding model loaded successfully (dim: 768)
-2025-10-28 19:31:26,469 - app.tools.rag_tool - INFO - Using existing ChromaDB collection: customer_support_docs
-2025-10-28 19:31:26,469 - app.tools.base_tool - INFO - Tool 'rag_search' initialized successfully
-2025-10-28 19:31:26,469 - app.agents.chat_agent - INFO - ✓ RAG tool initialized
-2025-10-28 19:31:26,470 - app.tools.memory_tool - INFO - Memory tool initialized with database: sqlite:///./data/customer_support.db
-2025-10-28 19:31:26,470 - app.tools.base_tool - INFO - Tool 'memory_management' initialized successfully
-2025-10-28 19:31:26,470 - app.agents.chat_agent - INFO - ✓ Memory tool initialized
-2025-10-28 19:31:26,532 - app.tools.attachment_tool - INFO - MarkItDown initialized with all plugins
-2025-10-28 19:31:26,532 - app.tools.attachment_tool - INFO - Attachment temp directory: /tmp/cs_agent_attachments
-2025-10-28 19:31:26,532 - app.tools.base_tool - INFO - Tool 'attachment_processor' initialized successfully
-2025-10-28 19:31:26,532 - app.agents.chat_agent - INFO - ✓ Attachment tool initialized
-2025-10-28 19:31:26,532 - app.tools.escalation_tool - INFO - Escalation tool initialized with 25 keywords
-2025-10-28 19:31:26,532 - app.tools.base_tool - INFO - Tool 'escalation_check' initialized successfully
-2025-10-28 19:31:26,532 - app.agents.chat_agent - INFO - ✓ Escalation tool initialized
-2025-10-28 19:31:26,532 - app.agents.chat_agent - INFO - Agent initialized with 4 tools
-2025-10-28 19:31:26,532 - app.main - INFO - ✓ AI agent initialized successfully
-2025-10-28 19:31:27,007 - app.tools.rag_tool - INFO - Added 10 documents (10 chunks) to knowledge base
-2025-10-28 19:31:27,007 - app.main - INFO - Added 10 sample documents to knowledge base
-2025-10-28 19:31:27,008 - app.database - INFO - All required tables exist: ['memories', 'messages', 'sessions']
-2025-10-28 19:31:27,009 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 19:31:27,009 - app.main - INFO - Startup checks: Database: ✓, Tables: ✓, Redis: ✓, Agent Tools: 4
-2025-10-28 19:31:27,009 - app.main - INFO - ============================================================
-2025-10-28 19:31:27,009 - app.main - INFO - Application started successfully
-2025-10-28 19:31:27,009 - app.main - INFO - API docs available at: http://0.0.0.0:8000/docs
-2025-10-28 19:31:27,009 - app.main - INFO - ============================================================
+2025-10-28 19:51:37,953 - app.main - INFO - ============================================================
+2025-10-28 19:51:37,954 - app.main - INFO - Starting Customer Support AI Agent v1.0.0
+2025-10-28 19:51:37,954 - app.main - INFO - Environment: Environment.DEVELOPMENT
+2025-10-28 19:51:37,954 - app.main - INFO - ============================================================
+2025-10-28 19:51:37,954 - app.main - INFO - Initializing database...
+2025-10-28 19:51:37,954 - app.database - INFO - Initializing database...
+2025-10-28 19:51:37,954 - app.database - INFO - Registered models:
+2025-10-28 19:51:37,954 - app.database - INFO - Tables to be created:
+2025-10-28 19:51:37,954 - app.database - INFO - Importing memory model...
+2025-10-28 19:51:37,954 - app.database - INFO - Found model class: Memory with table: memories
+2025-10-28 19:51:37,954 - app.database - INFO - Memory model imported successfully
+2025-10-28 19:51:37,954 - app.database - INFO - Importing session model...
+2025-10-28 19:51:37,954 - app.database - INFO - Found model class: Session with table: sessions
+2025-10-28 19:51:37,954 - app.database - INFO - Session model imported successfully
+2025-10-28 19:51:37,954 - app.database - INFO - Importing message model...
+2025-10-28 19:51:37,954 - app.database - INFO - Found model class: Message with table: messages
+2025-10-28 19:51:37,954 - app.database - INFO - Message model imported successfully
+2025-10-28 19:51:37,954 - app.database - INFO - Registered models:
+2025-10-28 19:51:37,954 - app.database - INFO - Tables to be created:
+2025-10-28 19:51:37,954 - app.database - INFO - Creating database tables...
+2025-10-28 19:51:37,955 - app.database - INFO - Database tables creation command executed
+2025-10-28 19:51:37,956 - app.database - INFO - Database tables created successfully: ['memories', 'messages', 'sessions']
+2025-10-28 19:51:37,956 - app.database - INFO - Database file exists: ./data/customer_support.db
+2025-10-28 19:51:37,956 - app.database - INFO - Database file size: 49152 bytes
+2025-10-28 19:51:37,956 - app.database - INFO - Tables in database: ['memories', 'messages', 'sessions']
+2025-10-28 19:51:37,956 - app.database - INFO - Table 'memories' columns: ['id', 'session_id', 'created_at', 'updated_at', 'last_accessed', 'content_type', 'content', 'metadata', 'importance', 'access_count']
+2025-10-28 19:51:37,957 - app.database - INFO - Table 'messages' columns: ['id', 'session_id', 'role', 'content', 'timestamp', 'metadata']
+2025-10-28 19:51:37,957 - app.database - INFO - Table 'sessions' columns: ['id', 'user_id', 'thread_id', 'created_at', 'updated_at', 'last_activity', 'status', 'escalated', 'escalation_ticket_id', 'metadata']
+2025-10-28 19:51:37,957 - app.main - INFO - Initializing cache service...
+2025-10-28 19:51:37,957 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:51:37,958 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:51:37,959 - app.main - INFO - ✓ Cache service connected
+2025-10-28 19:51:37,959 - app.main - INFO - Initializing AI agent...
+2025-10-28 19:51:37,959 - app.agents.chat_agent - INFO - Initializing agent tools...
+2025-10-28 19:51:37,959 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:51:37,959 - app.tools.rag_tool - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 19:51:37,960 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 19:51:41,019 - app.tools.rag_tool - INFO - Embedding model loaded successfully (dim: 768)
+2025-10-28 19:51:41,276 - app.tools.rag_tool - INFO - Using existing ChromaDB collection: customer_support_docs
+2025-10-28 19:51:41,277 - app.tools.base_tool - INFO - Tool 'rag_search' initialized successfully
+2025-10-28 19:51:41,277 - app.agents.chat_agent - INFO - ✓ RAG tool initialized
+2025-10-28 19:51:41,278 - app.tools.memory_tool - INFO - Memory tool initialized with database: sqlite:///./data/customer_support.db
+2025-10-28 19:51:41,278 - app.tools.base_tool - INFO - Tool 'memory_management' initialized successfully
+2025-10-28 19:51:41,278 - app.agents.chat_agent - INFO - ✓ Memory tool initialized
+2025-10-28 19:51:41,340 - app.tools.attachment_tool - INFO - MarkItDown initialized with all plugins
+2025-10-28 19:51:41,340 - app.tools.attachment_tool - INFO - Attachment temp directory: /tmp/cs_agent_attachments
+2025-10-28 19:51:41,340 - app.tools.base_tool - INFO - Tool 'attachment_processor' initialized successfully
+2025-10-28 19:51:41,340 - app.agents.chat_agent - INFO - ✓ Attachment tool initialized
+2025-10-28 19:51:41,340 - app.tools.escalation_tool - INFO - Escalation tool initialized with 25 keywords
+2025-10-28 19:51:41,340 - app.tools.base_tool - INFO - Tool 'escalation_check' initialized successfully
+2025-10-28 19:51:41,340 - app.agents.chat_agent - INFO - ✓ Escalation tool initialized
+2025-10-28 19:51:41,340 - app.agents.chat_agent - INFO - Agent initialized with 4 tools
+2025-10-28 19:51:41,340 - app.main - INFO - ✓ AI agent initialized successfully
+2025-10-28 19:51:41,824 - app.tools.rag_tool - INFO - Added 10 documents (10 chunks) to knowledge base
+2025-10-28 19:51:41,825 - app.main - INFO - Added 10 sample documents to knowledge base
+2025-10-28 19:51:41,826 - app.database - INFO - All required tables exist: ['memories', 'messages', 'sessions']
+2025-10-28 19:51:41,826 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:51:41,827 - app.main - INFO - Startup checks: Database: ✓, Tables: ✓, Redis: ✓, Agent Tools: 4
+2025-10-28 19:51:41,827 - app.main - INFO - ============================================================
+2025-10-28 19:51:41,827 - app.main - INFO - Application started successfully
+2025-10-28 19:51:41,827 - app.main - INFO - API docs available at: http://0.0.0.0:8000/docs
+2025-10-28 19:51:41,827 - app.main - INFO - ============================================================
 INFO:     Application startup complete.
-2025-10-28 19:31:27,009 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
+2025-10-28 19:51:41,827 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-2025-10-28 19:31:50,665 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761651110646_8bna3u4sr]
-2025-10-28 19:31:50,666 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761651110647_dqrqrnb99]
-2025-10-28 19:31:50,772 - app.agents.chat_agent - INFO - Created new context for session: sess_c2e30c1fde90
-2025-10-28 19:31:50,772 - app.api.routes.sessions - INFO - Created session: sess_c2e30c1fde90 for user: None
-2025-10-28 19:31:50,862 - app.agents.chat_agent - INFO - Created new context for session: sess_52529f4d8594
-2025-10-28 19:31:50,863 - app.api.routes.sessions - INFO - Created session: sess_52529f4d8594 for user: None
-INFO:     127.0.0.1:49476 - "POST /api/sessions HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49464 - "POST /api/sessions HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49482 - "WebSocket /ws?session_id=undefined" 403
+2025-10-28 19:52:26,112 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761652346100_tagoxpwva]
+2025-10-28 19:52:26,114 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761652346100_xnahet9nd]
+2025-10-28 19:52:26,226 - app.agents.chat_agent - INFO - Created new context for session: sess_05c2a060ed9f
+2025-10-28 19:52:26,226 - app.api.routes.sessions - INFO - Created session: sess_05c2a060ed9f for user: None
+2025-10-28 19:52:26,228 - app.api.routes.sessions - ERROR - Failed to create session: Could not refresh instance '<Session at 0x71d267972840>'
+Traceback (most recent call last):
+  File "/Home1/project/customer-support-agent-v2/backend/app/api/routes/sessions.py", line 75, in create_session
+    db.refresh(session)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 3184, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<Session at 0x71d267972840>'
+INFO:     127.0.0.1:57942 - "POST /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57944 - "POST /api/sessions HTTP/1.1" 500 Internal Server Error
+2025-10-28 19:52:26,240 - app.api.websocket - WARNING - Invalid session_id provided: undefined
+INFO:     127.0.0.1:57954 - "WebSocket /ws?session_id=undefined" 403
 INFO:     connection rejected (403 Forbidden)
 INFO:     connection closed
-2025-10-28 19:31:50,911 - app.utils.middleware - INFO - Request started: GET /api/chat/sessions/undefined/messages [req_1761651110906_7to07ek0v]
-INFO:     127.0.0.1:49490 - "GET /api/chat/sessions/undefined/messages?limit=50&offset=0 HTTP/1.1" 400 Bad Request
-INFO:     127.0.0.1:49494 - "WebSocket /ws?session_id=undefined" 403
-INFO:     connection rejected (403 Forbidden)
-INFO:     connection closed
-2025-10-28 19:31:50,927 - app.utils.middleware - INFO - Request started: GET /api/chat/sessions/undefined/messages [req_1761651110922_zbyazgj2k]
-INFO:     127.0.0.1:49502 - "GET /api/chat/sessions/undefined/messages?limit=50&offset=0 HTTP/1.1" 400 Bad Request
+2025-10-28 19:52:26,282 - app.utils.middleware - INFO - Request started: GET /api/chat/sessions/undefined/messages [req_1761652346277_sc93bov73]
+INFO:     127.0.0.1:57956 - "GET /api/chat/sessions/undefined/messages?limit=50&offset=0 HTTP/1.1" 400 Bad Request
 ^CINFO:     Shutting down
 INFO:     Waiting for application shutdown.
-2025-10-28 19:32:38,000 - app.main - INFO - ============================================================
-2025-10-28 19:32:38,000 - app.main - INFO - Shutting down application...
-2025-10-28 19:32:38,000 - app.agents.chat_agent - INFO - Cleaning up agent resources...
-2025-10-28 19:32:38,008 - app.tools.memory_tool - INFO - Memory cleanup completed: 0 memories deleted (0 old, 0 excess)
-2025-10-28 19:32:38,008 - app.agents.chat_agent - INFO - Cleaned up session: sess_c2e30c1fde90
-2025-10-28 19:32:38,010 - app.tools.memory_tool - INFO - Memory cleanup completed: 0 memories deleted (0 old, 0 excess)
-2025-10-28 19:32:38,010 - app.agents.chat_agent - INFO - Cleaned up session: sess_52529f4d8594
-2025-10-28 19:32:38,011 - app.services.cache_service - INFO - Redis cache service closed
-2025-10-28 19:32:38,011 - app.agents.chat_agent - INFO - Cleaned up rag tool
-2025-10-28 19:32:38,011 - app.agents.chat_agent - INFO - Cleaned up memory tool
-2025-10-28 19:32:38,011 - app.tools.attachment_tool - INFO - Attachment tool cleanup: 0 files removed
-2025-10-28 19:32:38,011 - app.agents.chat_agent - INFO - Cleaned up attachment tool
-2025-10-28 19:32:38,011 - app.agents.chat_agent - INFO - Cleaned up escalation tool
-2025-10-28 19:32:38,011 - app.agents.chat_agent - INFO - Agent cleanup complete
-2025-10-28 19:32:38,011 - app.main - INFO - ✓ Agent cleanup complete
-2025-10-28 19:32:38,011 - app.services.cache_service - INFO - Redis cache service closed
-2025-10-28 19:32:38,011 - app.main - INFO - ✓ Cache connections closed
-2025-10-28 19:32:38,011 - app.database - INFO - Cleaning up database connections...
-2025-10-28 19:32:38,012 - app.database - INFO - Database cleanup complete
-2025-10-28 19:32:38,012 - app.main - INFO - ✓ Database cleanup complete
-2025-10-28 19:32:38,012 - app.main - INFO - Application shutdown complete
-2025-10-28 19:32:38,012 - app.main - INFO - ============================================================
+2025-10-28 19:53:55,194 - app.main - INFO - ============================================================
+2025-10-28 19:53:55,194 - app.main - INFO - Shutting down application...
+2025-10-28 19:53:55,194 - app.agents.chat_agent - INFO - Cleaning up agent resources...
+2025-10-28 19:53:55,202 - app.tools.memory_tool - INFO - Memory cleanup completed: 0 memories deleted (0 old, 0 excess)
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Cleaned up session: sess_05c2a060ed9f
+2025-10-28 19:53:55,203 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Cleaned up rag tool
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Cleaned up memory tool
+2025-10-28 19:53:55,203 - app.tools.attachment_tool - INFO - Attachment tool cleanup: 0 files removed
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Cleaned up attachment tool
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Cleaned up escalation tool
+2025-10-28 19:53:55,203 - app.agents.chat_agent - INFO - Agent cleanup complete
+2025-10-28 19:53:55,203 - app.main - INFO - ✓ Agent cleanup complete
+2025-10-28 19:53:55,204 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 19:53:55,204 - app.main - INFO - ✓ Cache connections closed
+2025-10-28 19:53:55,204 - app.database - INFO - Cleaning up database connections...
+2025-10-28 19:53:55,204 - app.database - INFO - Database cleanup complete
+2025-10-28 19:53:55,204 - app.main - INFO - ✓ Database cleanup complete
+2025-10-28 19:53:55,204 - app.main - INFO - Application shutdown complete
+2025-10-28 19:53:55,204 - app.main - INFO - ============================================================
 INFO:     Application shutdown complete.
-INFO:     Finished server process [420968]
-
+INFO:     Finished server process [432073]
