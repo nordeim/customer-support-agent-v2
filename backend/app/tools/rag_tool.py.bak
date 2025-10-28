@@ -103,7 +103,7 @@ class RAGTool(BaseTool):
                 )
                 logger.info(f"Using existing ChromaDB collection: {settings.chroma_collection_name}")
                 
-            except chromadb.errors.NotFoundError:
+            except ValueError:
                 # Collection doesn't exist, create it
                 self.collection = self.chroma_client.create_collection(
                     name=settings.chroma_collection_name,
@@ -377,7 +377,6 @@ class RAGTool(BaseTool):
             
             # Clear cache as new documents were added
             if self.cache.enabled:
-                import asyncio
                 asyncio.create_task(self.cache.clear_pattern("rag_search:*"))
             
             logger.info(
