@@ -304,8 +304,8 @@ class Settings(BaseSettings):
     )
     
     embedding_gemma_model: str = Field(
-        default="google/embedding-gemma-256m-it",
-        description="Google EmbeddingGemma model name"
+        default="Qwen/Qwen3-Embedding-0.6B",
+        description="Qwen3 Embedding model 0.6B"
     )
     
     embedding_dimension: Annotated[int, Field(ge=1)] = Field(
