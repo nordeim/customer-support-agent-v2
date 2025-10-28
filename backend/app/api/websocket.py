@@ -1,7 +1,7 @@
 """
 WebSocket endpoint for real-time chat.
 """
-from fastapi import WebSocket, WebSocketDisconnect, Depends, Query
+from fastapi import WebSocket, WebSocketDisconnect, Depends, Query, HTTPException
 from typing import Dict, Set, Optional
 import json
 import logging
@@ -129,8 +129,10 @@ async def websocket_endpoint(
         agent: Customer support agent
         db: Database session
     """
-    if not session_id:
-        await websocket.close(code=4001, reason="Session ID is required")
+    # Validate session_id
+    if not session_id or session_id == "undefined":
+        logger.warning(f"Invalid session_id provided: {session_id}")
+        await websocket.close(code=4001, reason="Invalid session_id")
         return
     
     client_id = str(uuid.uuid4())
@@ -139,6 +141,7 @@ async def websocket_endpoint(
     try:
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
+            logger.warning(f"Session not found: {session_id}")
             await websocket.close(code=4004, reason="Session not found")
             return
     except Exception as e:
@@ -150,6 +153,7 @@ async def websocket_endpoint(
     try:
         from ..main import app
         if not hasattr(app.state, 'agent'):
+            logger.error("Agent not initialized")
             await websocket.close(code=5000, reason="Agent not initialized")
             return
         agent = app.state.agent

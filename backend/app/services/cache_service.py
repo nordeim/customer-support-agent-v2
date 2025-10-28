@@ -248,7 +248,12 @@ class CacheService:
             
         except Exception as e:
             logger.error(f"Cache clear pattern error: {e}")
-            return 0
+            # Fallback to in-memory cache
+            full_pattern = self._make_key(pattern)
+            keys_to_delete = [k for k in self._memory_cache.keys() if full_pattern in k]
+            for key in keys_to_delete:
+                del self._memory_cache[key]
+            return len(keys_to_delete)
     
     async def ping(self) -> bool:
         """

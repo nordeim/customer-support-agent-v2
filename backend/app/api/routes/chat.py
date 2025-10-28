@@ -56,19 +56,25 @@ async def send_message(
     """
     # Validate session_id
     if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid session_id. Please create a new session or provide a valid session ID."
+        )
     
     try:
         # Validate session exists
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
-            raise HTTPException(status_code=404, detail="Session not found")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Session not found with ID: {session_id}. Please create a new session."
+            )
         
         # Check session status
         if session.status != "active":
             raise HTTPException(
                 status_code=400,
-                detail=f"Session is {session.status}. Cannot send messages."
+                detail=f"Session is {session.status}. Cannot send messages to inactive sessions."
             )
         
         # Process attachments
@@ -206,13 +212,19 @@ async def get_messages(
     """
     # Validate session_id
     if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid session_id. Please provide a valid session ID."
+        )
     
     try:
         # Validate session exists
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
-            raise HTTPException(status_code=404, detail="Session not found")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Session not found with ID: {session_id}. Please create a new session."
+            )
         
         # Get total count
         total = db.query(Message).filter(Message.session_id == session_id).count()
@@ -305,7 +317,10 @@ async def upload_file(
     """
     # Validate session_id
     if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid session_id. Please provide a valid session ID."
+        )
     
     try:
         # Validate file size
