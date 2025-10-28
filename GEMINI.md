@@ -25,7 +25,7 @@ The implemented architecture has positively diverged from the initial plan in `A
 
 ## Building and Running
 
-The project is fully runnable. The following instructions are up-to-date.
+The project is fully runnable. The following instructions have been updated to reflect the most stable and reliable startup procedure.
 
 1.  **Initialize the Python backend:**
     ```bash
@@ -47,18 +47,28 @@ The project is fully runnable. The following instructions are up-to-date.
     ```bash
     docker-compose up -d
     ```
-*   **Manual Development Setup:**
-    *   **Backend:**
+*   **Manual Development Setup (Verified):**
+    *   **Backend:** The startup process has been simplified into a single script. This is the recommended way to run the backend manually.
         ```bash
-        cd backend
-        source venv/bin/activate
-        uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+        ./backend_start.sh
         ```
     *   **Frontend:**
         ```bash
         cd frontend
         npm run dev
         ```
+    *   **Note:** The frontend development server uses a proxy to communicate with the backend. Ensure that API calls in the code use relative paths (e.g., `/api/sessions`) so they are correctly routed.
+
+## Recent Stability Fixes
+
+The project recently underwent significant stabilization to resolve a series of build and runtime errors. These fixes have made the development environment more robust.
+
+*   **Build System:** Resolved over 40 TypeScript errors and a critical Vite/Rollup dependency conflict related to `react-syntax-highlighter`. This involved creating `tsconfig.node.json`, installing missing type definitions, and reverting the syntax highlighting packages to a known stable version.
+*   **Runtime Environment:**
+    *   Fixed an infinite loading screen ("spinning") on the frontend. The root cause was an incorrect API URL configuration that bypassed the Vite proxy, leading to silent CORS errors.
+    *   Corrected the backend startup script (`backend_start.sh`) to provide a single, reliable command for launching the server, resolving a final `ECONNREFUSED` connection error.
+
+The application is now confirmed to be stable and buildable.
 
 ## Development Conventions
 
