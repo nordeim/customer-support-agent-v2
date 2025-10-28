@@ -48,26 +48,13 @@ async def create_session(
         session_id = f"sess_{uuid.uuid4().hex[:12]}"
         thread_id = f"thread_{uuid.uuid4().hex[:12]}"
         
-        # Get metadata from request - use the correct field name
-        # Try multiple possible field names to handle different model versions
-        metadata = {}
-        if hasattr(request, 'metadata'):
-            metadata = request.metadata or {}
-        elif hasattr(request, 'tool_metadata'):
-            metadata = request.tool_metadata or {}
-        else:
-            # Log the available attributes for debugging
-            logger.warning(f"CreateSessionRequest attributes: {dir(request)}")
-            # Use empty dict as fallback
-            metadata = {}
-        
         # Create session in database
         session = Session(
             id=session_id,
             user_id=request.user_id,
             thread_id=thread_id,
             status="active",
-            metadata=metadata  # Use the correct field name
+            metadata=request.tool_metadata or {}
         )
         
         db.add(session)
@@ -87,7 +74,7 @@ async def create_session(
             thread_id=session.thread_id,
             status=SessionStatus(session.status),
             created_at=session.created_at,
-            metadata=session.metadata  # Use the correct field name
+            metadata=session.tool_metadata
         )
         
     except Exception as e:
@@ -121,7 +108,7 @@ async def get_session(
         thread_id=session.thread_id,
         status=SessionStatus(session.status),
         created_at=session.created_at,
-        metadata=session.metadata  # Use the correct field name
+        metadata=session.tool_metadata
     )
 
 
@@ -167,7 +154,7 @@ async def list_sessions(
                 thread_id=s.thread_id,
                 status=SessionStatus(s.status),
                 created_at=s.created_at,
-                metadata=s.metadata  # Use the correct field name
+                metadata=s.tool_metadata
             )
             for s in sessions
         ]
@@ -219,7 +206,7 @@ async def update_session_status(
             thread_id=session.thread_id,
             status=SessionStatus(session.status),
             created_at=session.created_at,
-            metadata=session.metadata  # Use the correct field name
+            metadata=session.tool_metadata
         )
         
     except HTTPException:
