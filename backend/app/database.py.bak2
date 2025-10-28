@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 import logging
 import os
-import inspect as py_inspect
 
 from .config import settings
 
@@ -71,21 +70,6 @@ def debug_registered_models():
         logger.error(f"Error debugging registered models: {e}")
 
 
-def discover_model_classes(module):
-    """Discover SQLAlchemy model classes in a module."""
-    model_classes = []
-    try:
-        for name, obj in py_inspect.getmembers(module):
-            if (py_inspect.isclass(obj) and 
-                hasattr(obj, '__tablename__') and 
-                hasattr(obj, '__table__')):
-                model_classes.append((name, obj))
-                logger.info(f"Found model class: {name} with table: {obj.__tablename__}")
-    except Exception as e:
-        logger.error(f"Error discovering model classes: {e}")
-    return model_classes
-
-
 def init_db() -> None:
     """Initialize database tables."""
     try:
@@ -95,14 +79,9 @@ def init_db() -> None:
         debug_registered_models()
         
         # Import all models to ensure they're registered with Base
-        memory_models = []
-        session_models = []
-        message_models = []
-        
         try:
             logger.info("Importing memory model...")
             from .models import memory
-            memory_models = discover_model_classes(memory)
             logger.info("Memory model imported successfully")
         except Exception as e:
             logger.error(f"Failed to import memory model: {e}")
@@ -110,7 +89,6 @@ def init_db() -> None:
         try:
             logger.info("Importing session model...")
             from .models import session
-            session_models = discover_model_classes(session)
             logger.info("Session model imported successfully")
         except Exception as e:
             logger.error(f"Failed to import session model: {e}")
@@ -118,7 +96,6 @@ def init_db() -> None:
         try:
             logger.info("Importing message model...")
             from .models import message
-            message_models = discover_model_classes(message)
             logger.info("Message model imported successfully")
         except Exception as e:
             logger.error(f"Failed to import message model: {e}")
@@ -142,32 +119,20 @@ def init_db() -> None:
             logger.error(f"Missing tables after creation: {missing_tables}")
             logger.info(f"Available tables: {table_names}")
             
-            # Try to create missing tables individually using discovered model classes
+            # Try to create missing tables individually
             for table_name in missing_tables:
                 try:
                     logger.info(f"Attempting to create table {table_name} individually...")
-                    
-                    if table_name == 'sessions' and session_models:
-                        for class_name, model_class in session_models:
-                            if model_class.__tablename__ == table_name:
-                                model_class.__table__.create(bind=engine, checkfirst=True)
-                                logger.info(f"Table {table_name} created using class {class_name}")
-                                break
-                    elif table_name == 'messages' and message_models:
-                        for class_name, model_class in message_models:
-                            if model_class.__tablename__ == table_name:
-                                model_class.__table__.create(bind=engine, checkfirst=True)
-                                logger.info(f"Table {table_name} created using class {class_name}")
-                                break
-                    elif table_name == 'memories' and memory_models:
-                        for class_name, model_class in memory_models:
-                            if model_class.__tablename__ == table_name:
-                                model_class.__table__.create(bind=engine, checkfirst=True)
-                                logger.info(f"Table {table_name} created using class {class_name}")
-                                break
-                    else:
-                        logger.warning(f"No matching model class found for table {table_name}")
-                        
+                    if table_name == 'sessions':
+                        from .models.session import SessionModel
+                        SessionModel.__table__.create(bind=engine, checkfirst=True)
+                    elif table_name == 'messages':
+                        from .models.message import MessageModel
+                        MessageModel.__table__.create(bind=engine, checkfirst=True)
+                    elif table_name == 'memories':
+                        from .models.memory import MemoryModel
+                        MemoryModel.__table__.create(bind=engine, checkfirst=True)
+                    logger.info(f"Table {table_name} created successfully")
                 except Exception as e:
                     logger.error(f"Failed to create table {table_name}: {e}")
             
@@ -178,59 +143,7 @@ def init_db() -> None:
             
             if missing_tables:
                 logger.error(f"Still missing tables after individual creation: {missing_tables}")
-                
-                # As a last resort, try to create tables using raw SQL
-                logger.info("Attempting to create missing tables using raw SQL...")
-                try:
-                    if 'sessions' in missing_tables:
-                        with engine.connect() as conn:
-                            conn.execute(text("""
-                                CREATE TABLE IF NOT EXISTS sessions (
-                                    id VARCHAR PRIMARY KEY,
-                                    user_id VARCHAR,
-                                    thread_id VARCHAR,
-                                    created_at TIMESTAMP,
-                                    updated_at TIMESTAMP,
-                                    last_activity TIMESTAMP,
-                                    status VARCHAR,
-                                    escalated BOOLEAN,
-                                    escalation_ticket_id VARCHAR,
-                                    metadata TEXT
-                                )
-                            """))
-                            conn.commit()
-                            logger.info("Sessions table created using raw SQL")
-                    
-                    if 'messages' in missing_tables:
-                        with engine.connect() as conn:
-                            conn.execute(text("""
-                                CREATE TABLE IF NOT EXISTS messages (
-                                    id VARCHAR PRIMARY KEY,
-                                    session_id VARCHAR,
-                                    role VARCHAR,
-                                    content TEXT,
-                                    timestamp TIMESTAMP,
-                                    metadata TEXT,
-                                    FOREIGN KEY (session_id) REFERENCES sessions (id)
-                                )
-                            """))
-                            conn.commit()
-                            logger.info("Messages table created using raw SQL")
-                    
-                    # Final check
-                    inspector = inspect(engine)
-                    table_names = inspector.get_table_names()
-                    missing_tables = [table for table in required_tables if table not in table_names]
-                    
-                    if missing_tables:
-                        logger.error(f"Still missing tables after raw SQL creation: {missing_tables}")
-                        raise Exception(f"Failed to create required tables: {missing_tables}")
-                    else:
-                        logger.info("All tables created successfully using raw SQL")
-                        
-                except Exception as e:
-                    logger.error(f"Failed to create tables using raw SQL: {e}")
-                    raise Exception(f"Failed to create required tables: {missing_tables}")
+                raise Exception(f"Failed to create required tables: {missing_tables}")
             else:
                 logger.info("All tables created successfully after individual creation attempts")
         else:
