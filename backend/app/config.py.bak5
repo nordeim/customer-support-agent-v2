@@ -531,9 +531,9 @@ class Settings(BaseSettings):
         description="Confidence threshold for escalation"
     )
     
-    escalation_keywords: Union[Dict[str, float], str] = Field(
-        default={"urgent": 1.0, "emergency": 1.0, "legal": 0.9, "complaint": 0.9, "manager": 0.8},
-        description="Keywords that trigger escalation with their weights"
+    escalation_keywords: Union[List[str], str] = Field(
+        default=["urgent", "emergency", "legal", "complaint", "manager"],
+        description="Keywords that trigger escalation"
     )
     
     escalation_notification_email: Optional[str] = Field(
@@ -656,35 +656,24 @@ class Settings(BaseSettings):
     
     @field_validator('escalation_keywords', mode='before')
     @classmethod
-    def parse_escalation_keywords(cls, v: Union[str, Dict[str, float], None]) -> Dict[str, float]:
+    def parse_escalation_keywords(cls, v: Union[str, List[str], None]) -> List[str]:
         """Parse escalation keywords from various formats."""
         if v is None:
-            return {"urgent": 1.0, "emergency": 1.0, "legal": 0.9, "complaint": 0.9, "manager": 0.8}
+            return ["urgent", "emergency", "legal", "complaint", "manager"]
         
-        if isinstance(v, dict):
+        if isinstance(v, list):
             return v
         
         if isinstance(v, str):
             # Try to parse as JSON first
-            if v.startswith('{'):
+            if v.startswith('['):
                 try:
                     return json.loads(v)
                 except json.JSONDecodeError:
                     pass
             
-            # Parse as comma-separated key=value pairs
-            result = {}
-            for pair in v.split(','):
-                if '=' in pair:
-                    key, value = pair.strip().split('=', 1)
-                    try:
-                        result[key] = float(value)
-                    except ValueError:
-                        result[key] = 0.8  # Default weight
-                else:
-                    # Just a keyword, use default weight
-                    result[pair.strip()] = 0.8
-            return result
+            # Parse as comma-separated string
+            return [keyword.strip() for keyword in v.split(',') if keyword.strip()]
         
         return v
     

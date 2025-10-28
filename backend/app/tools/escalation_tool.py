@@ -66,13 +66,21 @@ class EscalationTool(BaseTool):
         
         # Add any custom keywords from configuration
         if hasattr(settings, 'escalation_keywords'):
-            self.keywords.update(settings.escalation_keywords)
+            custom_keywords = settings.escalation_keywords
+            if isinstance(custom_keywords, dict):
+                self.keywords.update(custom_keywords)
+            else:
+                # Handle legacy format (list of strings)
+                if isinstance(custom_keywords, list):
+                    for keyword in custom_keywords:
+                        if keyword not in self.keywords:
+                            self.keywords[keyword] = 0.8  # Default weight
         
         # Escalation reasons for better tracking
         self.escalation_reasons = []
         
         logger.info(f"Escalation tool initialized with {len(self.keywords)} keywords")
-    
+
     def detect_keywords(self, text: str) -> Tuple[float, List[str]]:
         """
         Detect escalation keywords in text.
