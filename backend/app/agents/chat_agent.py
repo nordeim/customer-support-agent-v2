@@ -30,8 +30,8 @@ class AgentContext:
     metadata: Dict[str, Any] = None
     
     def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
+        if self.tool_metadata is None:
+            self.tool_metadata = {}
 
 
 class AgentResponse:
@@ -52,7 +52,7 @@ class AgentResponse:
         self.confidence = confidence
         self.tools_used = tools_used or []
         self.processing_time = processing_time
-        self.metadata = {}
+        self.tool_metadata = {}
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -63,7 +63,7 @@ class AgentResponse:
             "confidence": self.confidence,
             "tools_used": self.tools_used,
             "processing_time": self.processing_time,
-            "metadata": self.metadata
+            "metadata": self.tool_metadata
         }
 
 
@@ -471,7 +471,7 @@ Remember: Customer satisfaction is the top priority."""
             )
             
             # Add metadata
-            response.metadata = {
+            response.tool_metadata = {
                 "session_id": session_id,
                 "message_count": context.message_count,
                 "has_context": bool(session_context),
@@ -479,7 +479,7 @@ Remember: Customer satisfaction is the top priority."""
             }
             
             if escalation.get("ticket"):
-                response.metadata["ticket_id"] = escalation["ticket"]["ticket_id"]
+                response.tool_metadata["ticket_id"] = escalation["ticket"]["ticket_id"]
             
             logger.info(
                 f"Processed message for session {session_id} in {processing_time:.2f}s "

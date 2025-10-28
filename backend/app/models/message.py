@@ -26,7 +26,7 @@ class Message(Base):
     # Optional fields
     attachments = Column(JSON, default=list)  # List of attachment info
     sources = Column(JSON, default=list)  # RAG sources used
-    metadata = Column(JSON, default=dict)  # Additional metadata
+    tool_metadata = Column("metadata", JSON, default=dict)  # Additional metadata
     
     # Tool usage tracking
     tools_used = Column(JSON, default=list)

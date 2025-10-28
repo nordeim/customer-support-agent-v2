@@ -59,7 +59,7 @@ def init_db() -> None:
     from .models import memory, session, message  # Import all models
     
     logger.info("Creating database tables...")
-    Base.metadata.create_all(bind=engine)
+    Base.tool_metadata.create_all(bind=engine)
     logger.info("Database tables created successfully")
 
 

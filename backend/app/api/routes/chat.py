@@ -146,8 +146,8 @@ async def send_message(
         if agent_response.requires_escalation:
             session.status = "escalated"
             session.escalated = True
-            if agent_response.metadata.get("ticket_id"):
-                session.escalation_ticket_id = agent_response.metadata["ticket_id"]
+            if agent_response.tool_metadata.get("ticket_id"):
+                session.escalation_ticket_id = agent_response.tool_metadata["ticket_id"]
         
         db.commit()
         
@@ -172,7 +172,7 @@ async def send_message(
             session_id=session_id,
             timestamp=datetime.utcnow(),
             processing_time=agent_response.processing_time,
-            metadata=agent_response.metadata
+            metadata=agent_response.tool_metadata
         )
         
     except HTTPException:

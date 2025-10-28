@@ -26,7 +26,7 @@ class Session(Base):
     escalated = Column(Boolean, default=False)
     escalation_ticket_id = Column(String(50), nullable=True)
     
-    metadata = Column(JSON, default=dict)
+    tool_metadata = Column("metadata", JSON, default=dict)
     
     def __repr__(self):
         return f"<Session(id={self.id}, user={self.user_id}, status={self.status})>"

@@ -54,7 +54,7 @@ async def create_session(
             user_id=request.user_id,
             thread_id=thread_id,
             status="active",
-            metadata=request.metadata or {}
+            metadata=request.tool_metadata or {}
         )
         
         db.add(session)
@@ -74,7 +74,7 @@ async def create_session(
             thread_id=session.thread_id,
             status=SessionStatus(session.status),
             created_at=session.created_at,
-            metadata=session.metadata
+            metadata=session.tool_metadata
         )
         
     except Exception as e:
@@ -108,7 +108,7 @@ async def get_session(
         thread_id=session.thread_id,
         status=SessionStatus(session.status),
         created_at=session.created_at,
-        metadata=session.metadata
+        metadata=session.tool_metadata
     )
 
 
@@ -154,7 +154,7 @@ async def list_sessions(
                 thread_id=s.thread_id,
                 status=SessionStatus(s.status),
                 created_at=s.created_at,
-                metadata=s.metadata
+                metadata=s.tool_metadata
             )
             for s in sessions
         ]
@@ -206,7 +206,7 @@ async def update_session_status(
             thread_id=session.thread_id,
             status=SessionStatus(session.status),
             created_at=session.created_at,
-            metadata=session.metadata
+            metadata=session.tool_metadata
         )
         
     except HTTPException:

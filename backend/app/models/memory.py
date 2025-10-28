@@ -30,7 +30,7 @@ class Memory(Base):
     content = Column(Text, nullable=False)
     
     # Metadata
-    metadata = Column(JSON, default=dict)
+    tool_metadata = Column("metadata", JSON, default=dict)
     
     # Importance scoring
     importance = Column(Float, default=0.5, nullable=False)  # 0.0 to 1.0
