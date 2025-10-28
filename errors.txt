@@ -1,65 +1,221 @@
-$ python fix_sqlalchemy_imports.py
-🔍 Scanning backend/app/models/ for missing SQLAlchemy type imports...
-
-  📄 Checking memory.py...
-  ⚪ No changes needed for memory.py
-  📄 Checking message.py...
-  ✅ Fixed missing imports in message.py
-  📄 Checking session.py...
-  ⚪ No changes needed for session.py
-
-✅ Scan complete. 1 file(s) updated.
-
-Changed files:
-  - backend/app/models/message.py
-(venv) pete@pop-os:/Home1/project/customer-support-agent-v2
-$ egrep -i 'import|sqlalchemy|float|boolean|largebinary|enum' backend/app/models/message.py 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, JSON, String, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
-    processing_time = Column(Float, nullable=True)  # Time taken to generate response
-(venv) pete@pop-os:/Home1/project/customer-support-agent-v2
-
-$ cd backend/
-(venv) pete@pop-os:/Home1/project/customer-support-agent-v2/backend
-
-$ python -c "from app.models import Memory, Message, Session; print('✅ All models import successfully')"
-Failed to initialize tool 'memory_management': type object 'Base' has no attribute 'tool_metadata'
+$ python -m app.main
+/opt/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'schema_extra' has been renamed to 'json_schema_extra'
+  warnings.warn(message, UserWarning)
+/opt/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+* 'schema_extra' has been renamed to 'json_schema_extra'
+  warnings.warn(message, UserWarning)
+<frozen runpy>:128: RuntimeWarning: 'app.main' found in sys.modules after import of package 'app', but prior to execution of 'app.main'; this may result in unpredictable behaviour
+INFO:     Started server process [330499]
+INFO:     Waiting for application startup.
+2025-10-28 16:45:37,937 - app.main - INFO - ============================================================
+2025-10-28 16:45:37,937 - app.main - INFO - Starting Customer Support AI Agent v1.0.0
+2025-10-28 16:45:37,937 - app.main - INFO - Environment: Environment.DEVELOPMENT
+2025-10-28 16:45:37,937 - app.main - INFO - ============================================================
+2025-10-28 16:45:37,937 - app.main - INFO - Initializing database...
+2025-10-28 16:45:37,937 - app.database - INFO - Creating database tables...
+2025-10-28 16:45:37,938 - app.database - INFO - Database tables created successfully
+2025-10-28 16:45:37,938 - app.main - INFO - Initializing cache service...
+2025-10-28 16:45:37,938 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 16:45:37,939 - app.main - WARNING - ✗ Cache service unavailable - running without cache
+2025-10-28 16:45:37,939 - app.main - INFO - Initializing AI agent...
+2025-10-28 16:45:37,939 - app.agents.chat_agent - INFO - Initializing agent tools...
+2025-10-28 16:45:37,939 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 16:45:37,940 - app.tools.rag_tool - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 16:45:37,940 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 16:45:41,041 - app.tools.rag_tool - INFO - Embedding model loaded successfully (dim: 768)
+2025-10-28 16:45:41,308 - app.tools.rag_tool - INFO - Using existing ChromaDB collection: customer_support_docs
+2025-10-28 16:45:41,308 - app.tools.base_tool - INFO - Tool 'rag_search' initialized successfully
+2025-10-28 16:45:41,308 - app.agents.chat_agent - INFO - ✓ RAG tool initialized
+2025-10-28 16:45:41,309 - app.tools.memory_tool - INFO - Memory tool initialized with database: sqlite:///./data/customer_support.db
+2025-10-28 16:45:41,309 - app.tools.base_tool - INFO - Tool 'memory_management' initialized successfully
+2025-10-28 16:45:41,309 - app.agents.chat_agent - INFO - ✓ Memory tool initialized
+2025-10-28 16:45:41,368 - app.tools.attachment_tool - INFO - MarkItDown initialized with all plugins
+2025-10-28 16:45:41,368 - app.tools.attachment_tool - INFO - Attachment temp directory: /tmp/cs_agent_attachments
+2025-10-28 16:45:41,368 - app.tools.base_tool - INFO - Tool 'attachment_processor' initialized successfully
+2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - ✓ Attachment tool initialized
+2025-10-28 16:45:41,368 - app.tools.escalation_tool - INFO - Escalation tool initialized with 25 keywords
+2025-10-28 16:45:41,368 - app.tools.base_tool - INFO - Tool 'escalation_check' initialized successfully
+2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - ✓ Escalation tool initialized
+2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - Agent initialized with 4 tools
+2025-10-28 16:45:41,368 - app.main - INFO - ✓ AI agent initialized successfully
+2025-10-28 16:45:41,837 - app.tools.rag_tool - INFO - Added 10 documents (10 chunks) to knowledge base
+2025-10-28 16:45:41,837 - app.main - INFO - Added 10 sample documents to knowledge base
+2025-10-28 16:45:41,839 - app.main - INFO - Startup checks: Database: ✓, Redis: ✗, Agent Tools: 4
+2025-10-28 16:45:41,839 - app.main - INFO - ============================================================
+2025-10-28 16:45:41,839 - app.main - INFO - Application started successfully
+2025-10-28 16:45:41,839 - app.main - INFO - API docs available at: http://0.0.0.0:8000/docs
+2025-10-28 16:45:41,839 - app.main - INFO - ============================================================
+INFO:     Application startup complete.
+2025-10-28 16:45:41,840 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-10-28 16:46:15,803 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761641175785_reijnert8]
+2025-10-28 16:46:15,803 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761641175785_hge7awwao]
+2025-10-28 16:46:15,811 - app.api.routes.sessions - ERROR - Failed to create session: (sqlite3.OperationalError) no such table: sessions
+[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('sess_1fb08daddd5f', None, 'thread_087477b20d61', '2025-10-28 08:46:15.811356', '2025-10-28 08:46:15.811364', '2025-10-28 08:46:15.811368', 'active', 0, None, '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
 Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-  File "/Home1/project/customer-support-agent-v2/backend/app/__init__.py", line 15, in <module>
-    from .main import app
-  File "/Home1/project/customer-support-agent-v2/backend/app/main.py", line 13, in <module>
-    from .api.routes import chat, sessions, health
-  File "/Home1/project/customer-support-agent-v2/backend/app/api/__init__.py", line 5, in <module>
-    from .websocket import websocket_endpoint, ConnectionManager, manager
-  File "/Home1/project/customer-support-agent-v2/backend/app/api/websocket.py", line 11, in <module>
-    from ..agents.chat_agent import CustomerSupportAgent
-  File "/Home1/project/customer-support-agent-v2/backend/app/agents/__init__.py", line 5, in <module>
-    from .chat_agent import CustomerSupportAgent, AgentResponse, AgentContext
-  File "/Home1/project/customer-support-agent-v2/backend/app/agents/chat_agent.py", line 14, in <module>
-    from ..tools import RAGTool, MemoryTool, AttachmentTool, EscalationTool
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/__init__.py", line 7, in <module>
-    from .rag_tool import RAGTool
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/rag_tool.py", line 17, in <module>
-    from ..services.cache_service import CacheService
-  File "/Home1/project/customer-support-agent-v2/backend/app/services/__init__.py", line 16, in <module>
-    from .memory_service import MemoryService, memory_service
-  File "/Home1/project/customer-support-agent-v2/backend/app/services/memory_service.py", line 625, in <module>
-    memory_service = MemoryService()
-                     ^^^^^^^^^^^^^^^
-  File "/Home1/project/customer-support-agent-v2/backend/app/services/memory_service.py", line 30, in __init__
-    self.memory_tool = MemoryTool()
-                       ^^^^^^^^^^^^
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/memory_tool.py", line 43, in __init__
-    super().__init__(
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/base_tool.py", line 29, in __init__
-    self._initialize()
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/base_tool.py", line 34, in _initialize
-    self._setup()
-  File "/Home1/project/customer-support-agent-v2/backend/app/tools/memory_tool.py", line 60, in _setup
-    Base.tool_metadata.create_all(self.engine)
-    ^^^^^^^^^^^^^^^^^^
-AttributeError: type object 'Base' has no attribute 'tool_metadata'
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: sessions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Home1/project/customer-support-agent-v2/backend/app/api/routes/sessions.py", line 74, in create_session
+    db.commit()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1048, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: sessions
+[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('sess_1fb08daddd5f', None, 'thread_087477b20d61', '2025-10-28 08:46:15.811356', '2025-10-28 08:46:15.811364', '2025-10-28 08:46:15.811368', 'active', 0, None, '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-28 16:46:15,951 - app.api.routes.sessions - ERROR - Failed to create session: (sqlite3.OperationalError) no such table: sessions
+[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('sess_4822cd0987a3', None, 'thread_7a9a1887b71a', '2025-10-28 08:46:15.950928', '2025-10-28 08:46:15.950936', '2025-10-28 08:46:15.950940', 'active', 0, None, '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: sessions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Home1/project/customer-support-agent-v2/backend/app/api/routes/sessions.py", line 74, in create_session
+    db.commit()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1048, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: sessions
+[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('sess_4822cd0987a3', None, 'thread_7a9a1887b71a', '2025-10-28 08:46:15.950928', '2025-10-28 08:46:15.950936', '2025-10-28 08:46:15.950940', 'active', 0, None, '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:     127.0.0.1:43298 - "POST /api/sessions HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:43306 - "POST /api/sessions HTTP/1.1" 500 Internal Server Error
+^CINFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-10-28 16:47:25,957 - app.main - INFO - ============================================================
+2025-10-28 16:47:25,957 - app.main - INFO - Shutting down application...
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaning up agent resources...
+2025-10-28 16:47:25,957 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up rag tool
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up memory tool
+2025-10-28 16:47:25,957 - app.tools.attachment_tool - INFO - Attachment tool cleanup: 0 files removed
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up attachment tool
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up escalation tool
+2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Agent cleanup complete
+2025-10-28 16:47:25,957 - app.main - INFO - ✓ Agent cleanup complete
+2025-10-28 16:47:25,958 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 16:47:25,958 - app.main - INFO - ✓ Cache connections closed
+2025-10-28 16:47:25,958 - app.database - INFO - Cleaning up database connections...
+2025-10-28 16:47:25,958 - app.database - INFO - Database cleanup complete
+2025-10-28 16:47:25,958 - app.main - INFO - ✓ Database cleanup complete
+2025-10-28 16:47:25,958 - app.main - INFO - Application shutdown complete
+2025-10-28 16:47:25,958 - app.main - INFO - ============================================================
+INFO:     Application shutdown complete.
+INFO:     Finished server process [330499]
 
