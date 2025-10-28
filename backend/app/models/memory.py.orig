@@ -1,7 +1,7 @@
 """
 SQLAlchemy models for memory storage.
 """
-from sqlalchemy import Column, Integer, String, Text, DateTime, Float, JSON, Index
+from sqlalchemy import Column, String, Text, DateTime, Float, JSON, Index
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
