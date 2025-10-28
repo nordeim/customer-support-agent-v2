@@ -126,27 +126,20 @@ async def perform_startup_checks(app: FastAPI) -> None:
     """Perform critical health checks on startup."""
     checks = []
     
-    # Check database connection
+    # Check database
     try:
-        from .database import check_db_connection, check_tables_exist
-        if check_db_connection():
-            checks.append("Database: ✓")
-            
-            # Check if tables exist
-            if check_tables_exist():
-                checks.append("Tables: ✓")
-            else:
-                checks.append("Tables: ✗")
-                logger.error("Required database tables are missing")
-        else:
-            checks.append("Database: ✗")
-            logger.error("Database connection failed")
+        from .database import get_db
+        from sqlalchemy import text
+        db = next(get_db())
+        db.execute(text("SELECT 1"))
+        db.close()
+        checks.append("Database: ✓")
     except Exception as e:
         logger.error(f"Database check failed: {e}")
         checks.append("Database: ✗")
     
     # Check Redis
-    if hasattr(app.state, 'cache') and app.state.cache.enabled:
+    if app.state.cache.enabled:
         try:
             if await app.state.cache.ping():
                 checks.append("Redis: ✓")
@@ -162,11 +155,6 @@ async def perform_startup_checks(app: FastAPI) -> None:
         checks.append(f"Agent Tools: {len(agent.tools)}")
     
     logger.info(f"Startup checks: {', '.join(checks)}")
-    
-    # Fail startup if critical components are not ready
-    if "Database: ✗" in checks or "Tables: ✗" in checks:
-        logger.error("Critical startup checks failed")
-        raise RuntimeError("Application startup failed due to critical component issues")
 
 
 async def add_sample_knowledge(agent: CustomerSupportAgent) -> None:
@@ -281,39 +269,6 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
     """Handle uncaught exceptions gracefully."""
     request_id = getattr(request.state, "request_id", "unknown")
     
-    # Special handling for database errors
-    if "no such table" in str(exc):
-        logger.error(
-            f"Database table error in request {request_id}: {exc}",
-            exc_info=True,
-            extra={
-                "path": request.url.path,
-                "method": request.method,
-                "client": request.client.host if request.client else "unknown"
-            }
-        )
-        
-        # Try to recover by checking database state
-        try:
-            from .database import check_tables_exist
-            if not check_tables_exist():
-                logger.error("Database tables are missing - this indicates an initialization issue")
-        except Exception as db_check_error:
-            logger.error(f"Failed to check database state: {db_check_error}")
-        
-        metrics_collector.record_error()
-        
-        return JSONResponse(
-            status_code=500,
-            content={
-                "error": "Database configuration error",
-                "message": "The application database is not properly initialized",
-                "request_id": request_id,
-                "support": "Please contact support if this persists"
-            }
-        )
-    
-    # Standard error handling for other exceptions
     logger.error(
         f"Unhandled exception in request {request_id}: {exc}",
         exc_info=True,
@@ -324,7 +279,6 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
         }
     )
     
-    metrics_collector.request_id = getattr(request.state, "request_id", "unknown")
     metrics_collector.record_error()
     
     return JSONResponse(
