@@ -68,7 +68,7 @@ export const ChatInterface: React.FC = () => {
     if (!session) {
       initializeSession();
     }
-  }, []);
+  }, [session, initializeSession]);
 
   // Update sources when last message changes
   useEffect(() => {
