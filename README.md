@@ -516,7 +516,19 @@ CHROMA_PERSIST_DIRECTORY=./chroma_db
 FRONTEND_URL=http://localhost:3000
 ```
 
-#### 3️⃣ Install Dependencies
+#### 3️⃣ Download AI Models (One-Time Setup)
+
+Before starting the backend for the first time, you must download the required AI embedding models. This script will download and cache them locally.
+
+```bash
+# Navigate to the backend directory
+cd backend
+
+# Run the download script
+python scripts/download_model.py
+```
+
+#### 4️⃣ Install Dependencies
 
 **Backend:**
 ```bash

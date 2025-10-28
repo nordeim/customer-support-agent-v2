@@ -3,7 +3,7 @@ Chat API routes for message handling.
 """
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime
 import logging

@@ -57,7 +57,7 @@ class MemoryTool(BaseTool):
         )
         
         # Create tables if they don't exist
-        Base.tool_metadata.create_all(self.engine)
+        Base.metadata.create_all(self.engine)
         
         # Create session factory
         self.SessionLocal = sessionmaker(

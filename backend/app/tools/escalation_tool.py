@@ -4,7 +4,7 @@ Analyzes conversation context to determine escalation requirements.
 """
 import logging
 import re
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 
 from ..config import settings

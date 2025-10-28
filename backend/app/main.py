@@ -183,7 +183,7 @@ async def add_sample_knowledge(agent: CustomerSupportAgent) -> None:
 # Create FastAPI application
 app = FastAPI(
     title=settings.app_name,
-    version=settings.version,
+    version=settings.app_version,
     description="AI-powered customer support system with RAG, memory, and intelligent escalation",
     lifespan=lifespan,
     docs_url="/docs" if settings.debug else None,
@@ -249,7 +249,7 @@ async def root() -> Dict[str, Any]:
     """
     return {
         "name": settings.app_name,
-        "version": settings.version,
+        "version": settings.app_version,
         "environment": settings.environment,
         "status": "operational",
         "docs": "/docs" if settings.debug else "disabled",
