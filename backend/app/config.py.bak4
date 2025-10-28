@@ -443,12 +443,6 @@ class Settings(BaseSettings):
         description="Enable telemetry collection"
     )
     
-    # FIX: Added enable_telemetry field to match main.py usage
-    enable_telemetry: bool = Field(
-        default=False,
-        description="Enable telemetry/tracing for the application (disabled by default in development)."
-    )
-    
     metrics_enabled: bool = Field(
         default=True,
         description="Enable Prometheus metrics"
@@ -833,29 +827,6 @@ class Settings(BaseSettings):
                         config_dict[field] = "***MASKED***"
         
         return config_dict
-    
-    # ===========================
-    # Additional Validation Method
-    # ===========================
-    
-    def validate_required_settings(self) -> List[str]:
-        """
-        Validate that all required settings are present.
-        
-        Returns:
-            List of missing required settings
-        """
-        missing_settings = []
-        required_settings = [
-            'app_name', 'app_version', 'memory_enabled', 
-            'memory_max_entries', 'memory_ttl_hours', 'enable_telemetry'
-        ]
-        
-        for setting in required_settings:
-            if not hasattr(self, setting):
-                missing_settings.append(setting)
-        
-        return missing_settings
 
 
 # ===========================
@@ -880,14 +851,6 @@ def get_settings() -> Settings:
             logger = logging.getLogger(__name__)
             for warning in warnings:
                 logger.warning(f"Configuration warning: {warning}")
-        
-        # Validate required settings
-        missing = settings.validate_required_settings()
-        if missing:
-            import logging
-            logger = logging.getLogger(__name__)
-            for setting in missing:
-                logger.error(f"Missing required setting: {setting}")
         
         return settings
     except Exception as e:
