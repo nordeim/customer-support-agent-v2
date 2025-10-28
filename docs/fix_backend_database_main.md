@@ -554,4 +554,327 @@ These files are complete drop-in replacements that maintain all existing functio
 
 ---
 
+https://chat.z.ai/s/e0015b27-f0ee-4daf-9d27-cc8c6ed4e45c 
+
+---
+
+
+
+# Meticulous Plan for Merging Database Improvements
+
+## Executive Summary
+
+After a thorough analysis of both the original code and the suggested improvements, I've developed a comprehensive plan to merge the database enhancements while preserving all existing functionality. The plan focuses on addressing the "no such table: sessions" error by improving table creation verification and adding robust error handling, while maintaining the original code's structure and configuration patterns.
+
+## Detailed Analysis
+
+### Current State Assessment
+
+1. **Original Code Strengths**:
+   - Proper database configuration for SQLite vs other databases
+   - Clean separation of concerns
+   - Appropriate logging configuration
+   - Well-structured lifecycle management
+
+2. **Identified Issues**:
+   - Lack of table existence verification after creation
+   - Limited error reporting during initialization
+   - No explicit database connection verification
+   - Missing table existence checks in startup validation
+
+3. **Suggested Improvements Value**:
+   - Enhanced logging and verification
+   - Explicit table existence checking
+   - Better error handling
+   - Debug capabilities for troubleshooting
+
+## Merging Strategy
+
+### Guiding Principles
+
+1. **Preserve Original Functionality**: All existing features and configurations will be maintained
+2. **Selective Integration**: Only incorporate improvements that directly address the identified issues
+3. **Consistent Code Style**: Ensure merged code follows the original patterns and conventions
+4. **Environment-Specific Behavior**: Debug features will be limited to development environment
+5. **Backward Compatibility**: Ensure no breaking changes to existing interfaces
+
+## Implementation Plan
+
+### Phase 1: Enhanced Database Initialization
+
+#### 1.1 Update `init_db` Function in database.py
+
+```python
+def init_db() -> None:
+    """Initialize database tables."""
+    try:
+        logger.info("Initializing database...")
+        
+        # Import all models to ensure they're registered with Base
+        from .models import memory, session, message  # Import all models
+        
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables creation command executed")
+        
+        # Verify tables were created
+        inspector = engine.dialect.get_inspector(engine)
+        table_names = inspector.get_table_names()
+        
+        required_tables = ['sessions', 'messages', 'memories']
+        missing_tables = [table for table in required_tables if table not in table_names]
+        
+        if missing_tables:
+            logger.error(f"Missing tables after creation: {missing_tables}")
+            logger.info(f"Available tables: {table_names}")
+            raise Exception(f"Failed to create required tables: {missing_tables}")
+        else:
+            logger.info(f"Database tables created successfully: {table_names}")
+            
+        # Debug database state in development
+        if settings.environment == "development":
+            debug_database()
+            
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}", exc_info=True)
+        raise
+```
+
+#### 1.2 Add New Utility Functions to database.py
+
+```python
+def check_db_connection() -> bool:
+    """Check database connection and basic functionality."""
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            return result.fetchone()[0] == 1
+    except Exception as e:
+        logger.error(f"Database connection check failed: {e}")
+        return False
+
+
+def check_tables_exist() -> bool:
+    """Check if required tables exist in the database."""
+    try:
+        inspector = engine.dialect.get_inspector(engine)
+        table_names = inspector.get_table_names()
+        
+        required_tables = ['sessions', 'messages', 'memories']
+        missing_tables = [table for table in required_tables if table not in table_names]
+        
+        if missing_tables:
+            logger.error(f"Missing tables: {missing_tables}")
+            return False
+        
+        logger.info(f"All required tables exist: {table_names}")
+        return True
+    except Exception as e:
+        logger.error(f"Error checking tables: {e}")
+        return False
+
+
+def debug_database() -> None:
+    """Debug function to check database state (development only)."""
+    try:
+        import os
+        from .config import settings
+        
+        # Check database file
+        if "sqlite" in settings.database_url:
+            db_path = settings.database_url.replace("sqlite:///", "")
+            if os.path.exists(db_path):
+                logger.info(f"Database file exists: {db_path}")
+                logger.info(f"Database file size: {os.path.getsize(db_path)} bytes")
+            else:
+                logger.warning(f"Database file does not exist: {db_path}")
+                return
+        
+        # Check tables
+        inspector = engine.dialect.get_inspector(engine)
+        table_names = inspector.get_table_names()
+        logger.info(f"Tables in database: {table_names}")
+        
+        # Check table schemas
+        for table_name in table_names:
+            columns = inspector.get_columns(table_name)
+            logger.info(f"Table '{table_name}' columns: {[col['name'] for col in columns]}")
+            
+    except Exception as e:
+        logger.error(f"Database debug error: {e}")
+```
+
+### Phase 2: Enhanced Startup Checks
+
+#### 2.1 Update `perform_startup_checks` Function in main.py
+
+```python
+async def perform_startup_checks(app: FastAPI) -> None:
+    """Perform critical health checks on startup."""
+    checks = []
+    
+    # Check database connection
+    try:
+        from .database import check_db_connection, check_tables_exist
+        if check_db_connection():
+            checks.append("Database: ✓")
+            
+            # Check if tables exist
+            if check_tables_exist():
+                checks.append("Tables: ✓")
+            else:
+                checks.append("Tables: ✗")
+                logger.error("Required database tables are missing")
+        else:
+            checks.append("Database: ✗")
+            logger.error("Database connection failed")
+    except Exception as e:
+        logger.error(f"Database check failed: {e}")
+        checks.append("Database: ✗")
+    
+    # Check Redis
+    if hasattr(app.state, 'cache') and app.state.cache.enabled:
+        try:
+            if await app.state.cache.ping():
+                checks.append("Redis: ✓")
+            else:
+                checks.append("Redis: ✗")
+        except Exception as e:
+            logger.warning(f"Redis check failed: {e}")
+            checks.append("Redis: ✗")
+    
+    # Check agent tools
+    if hasattr(app.state, 'agent'):
+        agent = app.state.agent
+        checks.append(f"Agent Tools: {len(agent.tools)}")
+    
+    logger.info(f"Startup checks: {', '.join(checks)}")
+    
+    # Fail startup if critical components are not ready
+    if "Database: ✗" in checks or "Tables: ✗" in checks:
+        logger.error("Critical startup checks failed")
+        raise RuntimeError("Application startup failed due to critical component issues")
+```
+
+### Phase 3: Enhanced Error Handling
+
+#### 3.1 Update Global Exception Handler in main.py
+
+```python
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Handle uncaught exceptions gracefully."""
+    request_id = getattr(request.state, "request_id", "unknown")
+    
+    # Special handling for database errors
+    if "no such table" in str(exc):
+        logger.error(
+            f"Database table error in request {request_id}: {exc}",
+            exc_info=True,
+            extra={
+                "path": request.url.path,
+                "method": request.method,
+                "client": request.client.host if request.client else "unknown"
+            }
+        )
+        
+        # Try to recover by checking database state
+        try:
+            from .database import check_tables_exist
+            if not check_tables_exist():
+                logger.error("Database tables are missing - this indicates an initialization issue")
+        except Exception as db_check_error:
+            logger.error(f"Failed to check database state: {db_check_error}")
+        
+        metrics_collector.record_error()
+        
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Database configuration error",
+                "message": "The application database is not properly initialized",
+                "request_id": request_id,
+                "support": "Please contact support if this persists"
+            }
+        )
+    
+    # Standard error handling for other exceptions
+    logger.error(
+        f"Unhandled exception in request {request_id}: {exc}",
+        exc_info=True,
+        extra={
+            "path": request.url.path,
+            "method": request.method,
+            "client": request.client.host if request.client else "unknown"
+        }
+    )
+    
+    metrics_collector.record_error()
+    
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "message": str(exc) if settings.debug else "An unexpected error occurred",
+            "request_id": request_id,
+            "support": "Please contact support if this persists"
+        }
+    )
+```
+
+## Validation Plan
+
+### Phase 1: Code Validation
+
+1. **Syntax Check**: Verify all code changes are syntactically correct
+2. **Import Validation**: Ensure all imports are properly resolved
+3. **Function Signature Check**: Confirm all function signatures remain compatible
+4. **Environment-Specific Behavior**: Verify debug functions only activate in development
+
+### Phase 2: Functional Validation
+
+1. **Database Initialization**: Test table creation with both SQLite and PostgreSQL
+2. **Startup Checks**: Verify all health checks function correctly
+3. **Error Handling**: Test exception handling for database errors
+4. **Debug Functionality**: Confirm debug functions work in development environment
+
+### Phase 3: Integration Validation
+
+1. **Full Application Startup**: Test complete application startup sequence
+2. **Database Operations**: Verify all database operations function correctly
+3. **Error Recovery**: Test error recovery mechanisms
+4. **Performance Impact**: Assess any performance impact of additional checks
+
+## Implementation Checklist
+
+- [ ] Update `init_db` function in database.py with enhanced logging and verification
+- [ ] Add `check_db_connection` function to database.py
+- [ ] Add `check_tables_exist` function to database.py
+- [ ] Add `debug_database` function to database.py (development only)
+- [ ] Update `perform_startup_checks` function in main.py
+- [ ] Enhance global exception handler in main.py for database errors
+- [ ] Verify all imports are correct
+- [ ] Test database initialization with both SQLite and PostgreSQL
+- [ ] Test startup checks with all scenarios
+- [ ] Test error handling for database errors
+- [ ] Verify debug functionality in development environment
+- [ ] Confirm no impact on production performance
+
+## Rollback Plan
+
+If issues arise during implementation:
+
+1. **Immediate Rollback**: Revert to original database.py and main.py files
+2. **Partial Implementation**: Implement only the table verification without debug functions
+3. **Minimal Implementation**: Add only the enhanced error handling for database errors
+4. **Alternative Approach**: Consider using SQLAlchemy's event system for table verification
+
+## Long-term Considerations
+
+1. **Database Migration**: Consider implementing a proper migration system for schema changes
+2. **Health Check Endpoint**: Enhance the health check endpoint to include table verification
+3. **Monitoring**: Add metrics for database initialization and table verification
+4. **Documentation**: Update documentation to reflect the enhanced database initialization process
+
+This plan ensures that the suggested improvements are integrated in a way that addresses the "no such table: sessions" error while maintaining all existing functionality and following the original code's patterns and conventions.
 
