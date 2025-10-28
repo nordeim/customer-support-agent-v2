@@ -1,7 +1,7 @@
 """
 Message model for storing conversation messages.
 """
-from sqlalchemy import Column, String, Text, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, DateTime, Float, ForeignKey, JSON, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime

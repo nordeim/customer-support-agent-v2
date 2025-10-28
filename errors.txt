@@ -1,0 +1,65 @@
+$ python fix_sqlalchemy_imports.py
+🔍 Scanning backend/app/models/ for missing SQLAlchemy type imports...
+
+  📄 Checking memory.py...
+  ⚪ No changes needed for memory.py
+  📄 Checking message.py...
+  ✅ Fixed missing imports in message.py
+  📄 Checking session.py...
+  ⚪ No changes needed for session.py
+
+✅ Scan complete. 1 file(s) updated.
+
+Changed files:
+  - backend/app/models/message.py
+(venv) pete@pop-os:/Home1/project/customer-support-agent-v2
+$ egrep -i 'import|sqlalchemy|float|boolean|largebinary|enum' backend/app/models/message.py 
+from sqlalchemy import Column, DateTime, Float, ForeignKey, JSON, String, Text
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+    processing_time = Column(Float, nullable=True)  # Time taken to generate response
+(venv) pete@pop-os:/Home1/project/customer-support-agent-v2
+
+$ cd backend/
+(venv) pete@pop-os:/Home1/project/customer-support-agent-v2/backend
+
+$ python -c "from app.models import Memory, Message, Session; print('✅ All models import successfully')"
+Failed to initialize tool 'memory_management': type object 'Base' has no attribute 'tool_metadata'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Home1/project/customer-support-agent-v2/backend/app/__init__.py", line 15, in <module>
+    from .main import app
+  File "/Home1/project/customer-support-agent-v2/backend/app/main.py", line 13, in <module>
+    from .api.routes import chat, sessions, health
+  File "/Home1/project/customer-support-agent-v2/backend/app/api/__init__.py", line 5, in <module>
+    from .websocket import websocket_endpoint, ConnectionManager, manager
+  File "/Home1/project/customer-support-agent-v2/backend/app/api/websocket.py", line 11, in <module>
+    from ..agents.chat_agent import CustomerSupportAgent
+  File "/Home1/project/customer-support-agent-v2/backend/app/agents/__init__.py", line 5, in <module>
+    from .chat_agent import CustomerSupportAgent, AgentResponse, AgentContext
+  File "/Home1/project/customer-support-agent-v2/backend/app/agents/chat_agent.py", line 14, in <module>
+    from ..tools import RAGTool, MemoryTool, AttachmentTool, EscalationTool
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/__init__.py", line 7, in <module>
+    from .rag_tool import RAGTool
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/rag_tool.py", line 17, in <module>
+    from ..services.cache_service import CacheService
+  File "/Home1/project/customer-support-agent-v2/backend/app/services/__init__.py", line 16, in <module>
+    from .memory_service import MemoryService, memory_service
+  File "/Home1/project/customer-support-agent-v2/backend/app/services/memory_service.py", line 625, in <module>
+    memory_service = MemoryService()
+                     ^^^^^^^^^^^^^^^
+  File "/Home1/project/customer-support-agent-v2/backend/app/services/memory_service.py", line 30, in __init__
+    self.memory_tool = MemoryTool()
+                       ^^^^^^^^^^^^
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/memory_tool.py", line 43, in __init__
+    super().__init__(
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/base_tool.py", line 29, in __init__
+    self._initialize()
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/base_tool.py", line 34, in _initialize
+    self._setup()
+  File "/Home1/project/customer-support-agent-v2/backend/app/tools/memory_tool.py", line 60, in _setup
+    Base.tool_metadata.create_all(self.engine)
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Base' has no attribute 'tool_metadata'
+
