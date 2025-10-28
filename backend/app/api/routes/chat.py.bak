@@ -54,10 +54,6 @@ async def send_message(
     Returns:
         AI generated response with sources
     """
-    # Validate session_id
-    if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
-    
     try:
         # Validate session exists
         session = db.query(Session).filter(Session.id == session_id).first()
@@ -204,12 +200,8 @@ async def get_messages(
     Returns:
         List of messages with metadata
     """
-    # Validate session_id
-    if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
-    
     try:
-        # Validate session exists
+        # Validate session
         session = db.query(Session).filter(Session.id == session_id).first()
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -303,10 +295,6 @@ async def upload_file(
     Returns:
         File processing results
     """
-    # Validate session_id
-    if not session_id or session_id == "undefined":
-        raise HTTPException(status_code=400, detail="Invalid session_id")
-    
     try:
         # Validate file size
         contents = await file.read()

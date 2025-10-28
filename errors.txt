@@ -7,215 +7,118 @@ $ python -m app.main
 * 'schema_extra' has been renamed to 'json_schema_extra'
   warnings.warn(message, UserWarning)
 <frozen runpy>:128: RuntimeWarning: 'app.main' found in sys.modules after import of package 'app', but prior to execution of 'app.main'; this may result in unpredictable behaviour
-INFO:     Started server process [330499]
+INFO:     Started server process [405308]
 INFO:     Waiting for application startup.
-2025-10-28 16:45:37,937 - app.main - INFO - ============================================================
-2025-10-28 16:45:37,937 - app.main - INFO - Starting Customer Support AI Agent v1.0.0
-2025-10-28 16:45:37,937 - app.main - INFO - Environment: Environment.DEVELOPMENT
-2025-10-28 16:45:37,937 - app.main - INFO - ============================================================
-2025-10-28 16:45:37,937 - app.main - INFO - Initializing database...
-2025-10-28 16:45:37,937 - app.database - INFO - Creating database tables...
-2025-10-28 16:45:37,938 - app.database - INFO - Database tables created successfully
-2025-10-28 16:45:37,938 - app.main - INFO - Initializing cache service...
-2025-10-28 16:45:37,938 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 16:45:37,939 - app.main - WARNING - ✗ Cache service unavailable - running without cache
-2025-10-28 16:45:37,939 - app.main - INFO - Initializing AI agent...
-2025-10-28 16:45:37,939 - app.agents.chat_agent - INFO - Initializing agent tools...
-2025-10-28 16:45:37,939 - app.services.cache_service - INFO - Redis cache service connected
-2025-10-28 16:45:37,940 - app.tools.rag_tool - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
-2025-10-28 16:45:37,940 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-10-28 16:45:41,041 - app.tools.rag_tool - INFO - Embedding model loaded successfully (dim: 768)
-2025-10-28 16:45:41,308 - app.tools.rag_tool - INFO - Using existing ChromaDB collection: customer_support_docs
-2025-10-28 16:45:41,308 - app.tools.base_tool - INFO - Tool 'rag_search' initialized successfully
-2025-10-28 16:45:41,308 - app.agents.chat_agent - INFO - ✓ RAG tool initialized
-2025-10-28 16:45:41,309 - app.tools.memory_tool - INFO - Memory tool initialized with database: sqlite:///./data/customer_support.db
-2025-10-28 16:45:41,309 - app.tools.base_tool - INFO - Tool 'memory_management' initialized successfully
-2025-10-28 16:45:41,309 - app.agents.chat_agent - INFO - ✓ Memory tool initialized
-2025-10-28 16:45:41,368 - app.tools.attachment_tool - INFO - MarkItDown initialized with all plugins
-2025-10-28 16:45:41,368 - app.tools.attachment_tool - INFO - Attachment temp directory: /tmp/cs_agent_attachments
-2025-10-28 16:45:41,368 - app.tools.base_tool - INFO - Tool 'attachment_processor' initialized successfully
-2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - ✓ Attachment tool initialized
-2025-10-28 16:45:41,368 - app.tools.escalation_tool - INFO - Escalation tool initialized with 25 keywords
-2025-10-28 16:45:41,368 - app.tools.base_tool - INFO - Tool 'escalation_check' initialized successfully
-2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - ✓ Escalation tool initialized
-2025-10-28 16:45:41,368 - app.agents.chat_agent - INFO - Agent initialized with 4 tools
-2025-10-28 16:45:41,368 - app.main - INFO - ✓ AI agent initialized successfully
-2025-10-28 16:45:41,837 - app.tools.rag_tool - INFO - Added 10 documents (10 chunks) to knowledge base
-2025-10-28 16:45:41,837 - app.main - INFO - Added 10 sample documents to knowledge base
-2025-10-28 16:45:41,839 - app.main - INFO - Startup checks: Database: ✓, Redis: ✗, Agent Tools: 4
-2025-10-28 16:45:41,839 - app.main - INFO - ============================================================
-2025-10-28 16:45:41,839 - app.main - INFO - Application started successfully
-2025-10-28 16:45:41,839 - app.main - INFO - API docs available at: http://0.0.0.0:8000/docs
-2025-10-28 16:45:41,839 - app.main - INFO - ============================================================
+2025-10-28 19:03:02,224 - app.main - INFO - ============================================================
+2025-10-28 19:03:02,224 - app.main - INFO - Starting Customer Support AI Agent v1.0.0
+2025-10-28 19:03:02,224 - app.main - INFO - Environment: Environment.DEVELOPMENT
+2025-10-28 19:03:02,224 - app.main - INFO - ============================================================
+2025-10-28 19:03:02,224 - app.main - INFO - Initializing database...
+2025-10-28 19:03:02,224 - app.database - INFO - Initializing database...
+2025-10-28 19:03:02,224 - app.database - INFO - Registered models:
+2025-10-28 19:03:02,224 - app.database - INFO - Tables to be created:
+2025-10-28 19:03:02,224 - app.database - INFO - Importing memory model...
+2025-10-28 19:03:02,224 - app.database - INFO - Found model class: Memory with table: memories
+2025-10-28 19:03:02,224 - app.database - INFO - Memory model imported successfully
+2025-10-28 19:03:02,224 - app.database - INFO - Importing session model...
+2025-10-28 19:03:02,224 - app.database - INFO - Found model class: Session with table: sessions
+2025-10-28 19:03:02,225 - app.database - INFO - Session model imported successfully
+2025-10-28 19:03:02,225 - app.database - INFO - Importing message model...
+2025-10-28 19:03:02,225 - app.database - INFO - Found model class: Message with table: messages
+2025-10-28 19:03:02,225 - app.database - INFO - Message model imported successfully
+2025-10-28 19:03:02,225 - app.database - INFO - Registered models:
+2025-10-28 19:03:02,225 - app.database - INFO - Tables to be created:
+2025-10-28 19:03:02,225 - app.database - INFO - Creating database tables...
+2025-10-28 19:03:02,225 - app.database - INFO - Database tables creation command executed
+2025-10-28 19:03:02,226 - app.database - INFO - Database tables created successfully: ['memories', 'messages', 'sessions']
+2025-10-28 19:03:02,226 - app.database - INFO - Database file exists: ./data/customer_support.db
+2025-10-28 19:03:02,226 - app.database - INFO - Database file size: 49152 bytes
+2025-10-28 19:03:02,226 - app.database - INFO - Tables in database: ['memories', 'messages', 'sessions']
+2025-10-28 19:03:02,227 - app.database - INFO - Table 'memories' columns: ['id', 'session_id', 'created_at', 'updated_at', 'last_accessed', 'content_type', 'content', 'metadata', 'importance', 'access_count']
+2025-10-28 19:03:02,227 - app.database - INFO - Table 'messages' columns: ['id', 'session_id', 'role', 'content', 'timestamp', 'metadata']
+2025-10-28 19:03:02,227 - app.database - INFO - Table 'sessions' columns: ['id', 'user_id', 'thread_id', 'created_at', 'updated_at', 'last_activity', 'status', 'escalated', 'escalation_ticket_id', 'metadata']
+2025-10-28 19:03:02,227 - app.main - INFO - Initializing cache service...
+2025-10-28 19:03:02,228 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:03:02,229 - app.main - WARNING - ✗ Cache service unavailable - running without cache
+2025-10-28 19:03:02,229 - app.main - INFO - Initializing AI agent...
+2025-10-28 19:03:02,229 - app.agents.chat_agent - INFO - Initializing agent tools...
+2025-10-28 19:03:02,229 - app.services.cache_service - INFO - Redis cache service connected
+2025-10-28 19:03:02,229 - app.tools.rag_tool - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 19:03:02,230 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-10-28 19:03:05,483 - app.tools.rag_tool - INFO - Embedding model loaded successfully (dim: 768)
+2025-10-28 19:03:05,765 - app.tools.rag_tool - INFO - Using existing ChromaDB collection: customer_support_docs
+2025-10-28 19:03:05,765 - app.tools.base_tool - INFO - Tool 'rag_search' initialized successfully
+2025-10-28 19:03:05,765 - app.agents.chat_agent - INFO - ✓ RAG tool initialized
+2025-10-28 19:03:05,766 - app.tools.memory_tool - INFO - Memory tool initialized with database: sqlite:///./data/customer_support.db
+2025-10-28 19:03:05,766 - app.tools.base_tool - INFO - Tool 'memory_management' initialized successfully
+2025-10-28 19:03:05,766 - app.agents.chat_agent - INFO - ✓ Memory tool initialized
+2025-10-28 19:03:05,824 - app.tools.attachment_tool - INFO - MarkItDown initialized with all plugins
+2025-10-28 19:03:05,824 - app.tools.attachment_tool - INFO - Attachment temp directory: /tmp/cs_agent_attachments
+2025-10-28 19:03:05,824 - app.tools.base_tool - INFO - Tool 'attachment_processor' initialized successfully
+2025-10-28 19:03:05,824 - app.agents.chat_agent - INFO - ✓ Attachment tool initialized
+2025-10-28 19:03:05,825 - app.tools.escalation_tool - INFO - Escalation tool initialized with 25 keywords
+2025-10-28 19:03:05,825 - app.tools.base_tool - INFO - Tool 'escalation_check' initialized successfully
+2025-10-28 19:03:05,825 - app.agents.chat_agent - INFO - ✓ Escalation tool initialized
+2025-10-28 19:03:05,825 - app.agents.chat_agent - INFO - Agent initialized with 4 tools
+2025-10-28 19:03:05,825 - app.main - INFO - ✓ AI agent initialized successfully
+2025-10-28 19:03:06,311 - app.tools.rag_tool - INFO - Added 10 documents (10 chunks) to knowledge base
+2025-10-28 19:03:06,311 - app.main - INFO - Added 10 sample documents to knowledge base
+2025-10-28 19:03:06,312 - app.database - INFO - All required tables exist: ['memories', 'messages', 'sessions']
+2025-10-28 19:03:06,313 - app.main - INFO - Startup checks: Database: ✓, Tables: ✓, Redis: ✗, Agent Tools: 4
+2025-10-28 19:03:06,313 - app.main - INFO - ============================================================
+2025-10-28 19:03:06,313 - app.main - INFO - Application started successfully
+2025-10-28 19:03:06,313 - app.main - INFO - API docs available at: http://0.0.0.0:8000/docs
+2025-10-28 19:03:06,313 - app.main - INFO - ============================================================
 INFO:     Application startup complete.
-2025-10-28 16:45:41,840 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
+2025-10-28 19:03:06,313 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-2025-10-28 16:46:15,803 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761641175785_reijnert8]
-2025-10-28 16:46:15,803 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761641175785_hge7awwao]
-2025-10-28 16:46:15,811 - app.api.routes.sessions - ERROR - Failed to create session: (sqlite3.OperationalError) no such table: sessions
-[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
-[parameters: ('sess_1fb08daddd5f', None, 'thread_087477b20d61', '2025-10-28 08:46:15.811356', '2025-10-28 08:46:15.811364', '2025-10-28 08:46:15.811368', 'active', 0, None, '{}')]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-Traceback (most recent call last):
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
-    cursor.execute(statement, parameters)
-sqlite3.OperationalError: no such table: sessions
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Home1/project/customer-support-agent-v2/backend/app/api/routes/sessions.py", line 74, in create_session
-    db.commit()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
-    trans.commit(_to_root=True)
-  File "<string>", line 2, in commit
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
-    ret_value = fn(self, *arg, **kw)
-                ^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
-    self._prepare_impl()
-  File "<string>", line 2, in _prepare_impl
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
-    ret_value = fn(self, *arg, **kw)
-                ^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
-    self.session.flush()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
-    self._flush(objects)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
-    with util.safe_reraise():
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
-    raise exc_value.with_traceback(exc_tb)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
-    flush_context.execute()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
-    rec.execute(self)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
-    util.preloaded.orm_persistence.save_obj(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
-    _emit_insert_statements(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1048, in _emit_insert_statements
-    result = connection.execute(
-             ^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
-    return meth(
-           ^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
-    return connection._execute_clauseelement(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
-    ret = self._execute_context(
-          ^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
-    return self._exec_single_context(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
-    self._handle_dbapi_exception(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
-    cursor.execute(statement, parameters)
-sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: sessions
-[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
-[parameters: ('sess_1fb08daddd5f', None, 'thread_087477b20d61', '2025-10-28 08:46:15.811356', '2025-10-28 08:46:15.811364', '2025-10-28 08:46:15.811368', 'active', 0, None, '{}')]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-2025-10-28 16:46:15,951 - app.api.routes.sessions - ERROR - Failed to create session: (sqlite3.OperationalError) no such table: sessions
-[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
-[parameters: ('sess_4822cd0987a3', None, 'thread_7a9a1887b71a', '2025-10-28 08:46:15.950928', '2025-10-28 08:46:15.950936', '2025-10-28 08:46:15.950940', 'active', 0, None, '{}')]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-Traceback (most recent call last):
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
-    cursor.execute(statement, parameters)
-sqlite3.OperationalError: no such table: sessions
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Home1/project/customer-support-agent-v2/backend/app/api/routes/sessions.py", line 74, in create_session
-    db.commit()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
-    trans.commit(_to_root=True)
-  File "<string>", line 2, in commit
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
-    ret_value = fn(self, *arg, **kw)
-                ^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
-    self._prepare_impl()
-  File "<string>", line 2, in _prepare_impl
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
-    ret_value = fn(self, *arg, **kw)
-                ^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
-    self.session.flush()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
-    self._flush(objects)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
-    with util.safe_reraise():
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
-    raise exc_value.with_traceback(exc_tb)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
-    flush_context.execute()
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
-    rec.execute(self)
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
-    util.preloaded.orm_persistence.save_obj(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
-    _emit_insert_statements(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1048, in _emit_insert_statements
-    result = connection.execute(
-             ^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
-    return meth(
-           ^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
-    return connection._execute_clauseelement(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
-    ret = self._execute_context(
-          ^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
-    return self._exec_single_context(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
-    self._handle_dbapi_exception(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
-    cursor.execute(statement, parameters)
-sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: sessions
-[SQL: INSERT INTO sessions (id, user_id, thread_id, created_at, updated_at, last_activity, status, escalated, escalation_ticket_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
-[parameters: ('sess_4822cd0987a3', None, 'thread_7a9a1887b71a', '2025-10-28 08:46:15.950928', '2025-10-28 08:46:15.950936', '2025-10-28 08:46:15.950940', 'active', 0, None, '{}')]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-INFO:     127.0.0.1:43298 - "POST /api/sessions HTTP/1.1" 500 Internal Server Error
-INFO:     127.0.0.1:43306 - "POST /api/sessions HTTP/1.1" 500 Internal Server Error
+2025-10-28 19:03:31,525 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761649411504_kxpvn5dse]
+2025-10-28 19:03:31,526 - app.utils.middleware - INFO - Request started: POST /api/sessions [req_1761649411504_xu1dkp3hg]
+2025-10-28 19:03:31,632 - app.agents.chat_agent - INFO - Created new context for session: sess_02983b26bc82
+2025-10-28 19:03:31,633 - app.api.routes.sessions - INFO - Created session: sess_02983b26bc82 for user: None
+2025-10-28 19:03:31,745 - app.agents.chat_agent - INFO - Created new context for session: sess_7168010c2db1
+2025-10-28 19:03:31,745 - app.api.routes.sessions - INFO - Created session: sess_7168010c2db1 for user: None
+INFO:     127.0.0.1:44962 - "POST /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44974 - "POST /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44982 - "WebSocket /ws?session_id=undefined" [accepted]
+2025-10-28 19:03:31,758 - app.api.websocket - INFO - WebSocket connected: session=undefined, client=fc30cdfb-4266-437e-8c80-de22753573ed
+INFO:     connection open
+INFO:     127.0.0.1:44994 - "WebSocket /ws?session_id=undefined" [accepted]
+2025-10-28 19:03:31,771 - app.api.websocket - INFO - WebSocket connected: session=undefined, client=3f18dbc3-3ef6-4080-8ffa-4eee84a84d0b
+INFO:     connection open
+2025-10-28 19:03:31,814 - app.utils.middleware - INFO - Request started: GET /api/chat/sessions/undefined/messages [req_1761649411810_yy4v6a7iq]
+INFO:     127.0.0.1:45002 - "GET /api/chat/sessions/undefined/messages?limit=50&offset=0 HTTP/1.1" 404 Not Found
+2025-10-28 19:05:44,281 - app.api.websocket - INFO - WebSocket disconnected: session=undefined, client=fc30cdfb-4266-437e-8c80-de22753573ed
+2025-10-28 19:05:44,281 - app.api.websocket - INFO - WebSocket client fc30cdfb-4266-437e-8c80-de22753573ed disconnected from session undefined
+INFO:     connection closed
+2025-10-28 19:05:44,282 - app.api.websocket - INFO - WebSocket disconnected: session=undefined, client=3f18dbc3-3ef6-4080-8ffa-4eee84a84d0b
+2025-10-28 19:05:44,282 - app.api.websocket - INFO - WebSocket client 3f18dbc3-3ef6-4080-8ffa-4eee84a84d0b disconnected from session undefined
+INFO:     connection closed
+http://localhost:3000/
 ^CINFO:     Shutting down
 INFO:     Waiting for application shutdown.
-2025-10-28 16:47:25,957 - app.main - INFO - ============================================================
-2025-10-28 16:47:25,957 - app.main - INFO - Shutting down application...
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaning up agent resources...
-2025-10-28 16:47:25,957 - app.services.cache_service - INFO - Redis cache service closed
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up rag tool
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up memory tool
-2025-10-28 16:47:25,957 - app.tools.attachment_tool - INFO - Attachment tool cleanup: 0 files removed
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up attachment tool
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Cleaned up escalation tool
-2025-10-28 16:47:25,957 - app.agents.chat_agent - INFO - Agent cleanup complete
-2025-10-28 16:47:25,957 - app.main - INFO - ✓ Agent cleanup complete
-2025-10-28 16:47:25,958 - app.services.cache_service - INFO - Redis cache service closed
-2025-10-28 16:47:25,958 - app.main - INFO - ✓ Cache connections closed
-2025-10-28 16:47:25,958 - app.database - INFO - Cleaning up database connections...
-2025-10-28 16:47:25,958 - app.database - INFO - Database cleanup complete
-2025-10-28 16:47:25,958 - app.main - INFO - ✓ Database cleanup complete
-2025-10-28 16:47:25,958 - app.main - INFO - Application shutdown complete
-2025-10-28 16:47:25,958 - app.main - INFO - ============================================================
+2025-10-28 19:06:05,976 - app.main - INFO - ============================================================
+2025-10-28 19:06:05,976 - app.main - INFO - Shutting down application...
+2025-10-28 19:06:05,976 - app.agents.chat_agent - INFO - Cleaning up agent resources...
+2025-10-28 19:06:05,981 - app.tools.memory_tool - INFO - Memory cleanup completed: 0 memories deleted (0 old, 0 excess)
+2025-10-28 19:06:05,981 - app.agents.chat_agent - INFO - Cleaned up session: sess_02983b26bc82
+2025-10-28 19:06:05,983 - app.tools.memory_tool - INFO - Memory cleanup completed: 0 memories deleted (0 old, 0 excess)
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Cleaned up session: sess_7168010c2db1
+2025-10-28 19:06:05,983 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Cleaned up rag tool
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Cleaned up memory tool
+2025-10-28 19:06:05,983 - app.tools.attachment_tool - INFO - Attachment tool cleanup: 0 files removed
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Cleaned up attachment tool
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Cleaned up escalation tool
+2025-10-28 19:06:05,983 - app.agents.chat_agent - INFO - Agent cleanup complete
+2025-10-28 19:06:05,984 - app.main - INFO - ✓ Agent cleanup complete
+2025-10-28 19:06:05,984 - app.services.cache_service - INFO - Redis cache service closed
+2025-10-28 19:06:05,984 - app.main - INFO - ✓ Cache connections closed
+2025-10-28 19:06:05,984 - app.database - INFO - Cleaning up database connections...
+2025-10-28 19:06:05,984 - app.database - INFO - Database cleanup complete
+2025-10-28 19:06:05,984 - app.main - INFO - ✓ Database cleanup complete
+2025-10-28 19:06:05,984 - app.main - INFO - Application shutdown complete
+2025-10-28 19:06:05,984 - app.main - INFO - ============================================================
 INFO:     Application shutdown complete.
-INFO:     Finished server process [330499]
+INFO:     Finished server process [405308]
 

@@ -6,8 +6,7 @@ import json
 import logging
 from typing import Any, Optional, Union
 import hashlib
-from datetime import datetime
-import pickle
+from datetime import timedelta
 
 try:
     import redis.asyncio as redis
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class CacheService:
     """
-    Async Redis cache service with JSON serialization and fallback.
+    Async Redis cache service with JSON serialization.
     Provides caching for expensive operations like embeddings and searches.
     """
     
@@ -36,13 +35,12 @@ class CacheService:
         self.enabled = settings.cache_enabled
         self.default_ttl = settings.redis_ttl
         self._client = None
-        self._memory_cache = {}  # Fallback in-memory cache
         
         if self.enabled:
             self._connect()
     
     def _connect(self) -> None:
-        """Establish Redis connection with error handling."""
+        """Establish Redis connection."""
         try:
             self._client = redis.from_url(
                 self.url,
@@ -53,29 +51,6 @@ class CacheService:
         except Exception as e:
             logger.warning(f"Failed to connect to Redis: {e}. Caching disabled.")
             self.enabled = False
-            self._client = None
-            logger.info("Using in-memory cache as fallback")
-    
-    def _ensure_connection(self) -> bool:
-        """Ensure Redis connection is active."""
-        if not self.enabled or not self._client:
-            return False
-        
-        try:
-            # Test connection with ping
-            import asyncio
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # If in async context, we need to handle differently
-                return True
-            else:
-                # For sync context, create a new connection
-                self._connect()
-                return self.enabled
-        except Exception as e:
-            logger.warning(f"Redis connection lost: {e}")
-            self.enabled = False
-            return False
     
     def _make_key(self, key: str) -> str:
         """
@@ -114,10 +89,6 @@ class CacheService:
             Cached value or None if not found
         """
         if not self.enabled or not self._client:
-            # Fallback to in-memory cache
-            cache_key = self._make_key(self._hash_key(key))
-            if cache_key in self._memory_cache:
-                return self._memory_cache[cache_key]
             return None
         
         try:
@@ -133,10 +104,6 @@ class CacheService:
             
         except Exception as e:
             logger.error(f"Cache get error: {e}")
-            # Fallback to in-memory cache
-            cache_key = self._make_key(self._hash_key(key))
-            if cache_key in self._memory_cache:
-                return self._memory_cache[cache_key]
             return None
     
     async def set(
@@ -157,11 +124,7 @@ class CacheService:
             True if successful, False otherwise
         """
         if not self.enabled or not self._client:
-            # Fallback to in-memory cache
-            cache_key = self._make_key(self._hash_key(key))
-            self._memory_cache[cache_key] = value
-            logger.debug(f"In-memory cache set: {key[:50]}...")
-            return True
+            return False
         
         try:
             cache_key = self._make_key(self._hash_key(key))
@@ -181,9 +144,6 @@ class CacheService:
             
         except Exception as e:
             logger.error(f"Cache set error: {e}")
-            # Fallback to in-memory cache
-            cache_key = self._make_key(self._hash_key(key))
-            self._memory_cache[cache_key] = value
             return False
     
     async def delete(self, key: str) -> bool:
@@ -197,10 +157,6 @@ class CacheService:
             True if deleted, False otherwise
         """
         if not self.enabled or not self._client:
-            # Fallback to in-memory cache
-            cache_key = self._make_key(self._hash_key(key))
-            if cache_key in self._memory_cache:
-                del self._memory_cache[cache_key]
             return False
         
         try:
@@ -224,12 +180,7 @@ class CacheService:
             Number of keys deleted
         """
         if not self.enabled or not self._client:
-            # Fallback to in-memory cache
-            full_pattern = self._make_key(pattern)
-            keys_to_delete = [k for k in self._memory_cache.keys() if full_pattern in k]
-            for key in keys_to_delete:
-                del self._memory_cache[key]
-            return len(keys_to_delete)
+            return 0
         
         try:
             full_pattern = self._make_key(pattern)
@@ -264,9 +215,7 @@ class CacheService:
             await self._client.ping()
             return True
         except Exception:
-            # Try to reconnect
-            self._connect()
-            return self.enabled
+            return False
     
     async def close(self) -> None:
         """Close Redis connection."""
