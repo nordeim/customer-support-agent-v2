@@ -58,14 +58,11 @@ async def lifespan(app: FastAPI):
         cache_service = CacheService()
         app.state.cache = cache_service
         
-        # Test cache connection with better error handling
-        try:
-            if await cache_service.ping():
-                logger.info("✓ Cache service connected")
-            else:
-                logger.warning("✗ Cache service unavailable - running without cache")
-        except Exception as e:
-            logger.warning(f"✗ Cache service unavailable - running without cache: {e}")
+        # Test cache connection
+        if await cache_service.ping():
+            logger.info("✓ Cache service connected")
+        else:
+            logger.warning("✗ Cache service unavailable - running without cache")
         
         # Initialize telemetry
         if settings.enable_telemetry:
@@ -129,9 +126,8 @@ async def perform_startup_checks(app: FastAPI) -> None:
     # Check database
     try:
         from .database import get_db
-        from sqlalchemy import text
         db = next(get_db())
-        db.execute(text("SELECT 1"))
+        db.execute("SELECT 1")
         db.close()
         checks.append("Database: ✓")
     except Exception as e:

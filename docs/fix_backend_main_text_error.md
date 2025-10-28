@@ -1,3 +1,160 @@
+# Analysis of Latest Backend Startup Log
+
+## Executive Summary
+
+The application has successfully started, which is great progress! All the major components (RAG tool, Memory tool, Attachment tool, and Escalation tool) are now initializing correctly. However, there are a few issues that need attention:
+
+1. A database check failure due to SQLAlchemy text expression syntax
+2. Redis connection issues (though the app continues to run)
+3. Pydantic V2 warnings that should be addressed
+4. A runtime warning about module import order
+
+## Detailed Analysis
+
+### 1. Database Check Failure
+
+```
+2025-10-28 16:01:32,609 - app.main - ERROR - Database check failed: Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')
+```
+
+This error occurs in the `perform_startup_checks` function in `main.py`. The issue is that in newer versions of SQLAlchemy, raw SQL strings need to be explicitly wrapped with the `text()` function to avoid security warnings.
+
+### 2. Redis Connection Issues
+
+```
+2025-10-28 16:01:28,562 - app.main - WARNING - ✗ Cache service unavailable - running without cache
+2025-10-28 16:01:32,610 - app.services.cache_service - ERROR - Cache clear pattern error: Error 111 connecting to localhost:6379. Connection refused.
+```
+
+The application is trying to connect to Redis but failing. This is likely because Redis is not running or not configured correctly. The app continues to run, but caching functionality will be disabled.
+
+### 3. Pydantic V2 Warnings
+
+```
+/opt/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'schema_extra' has been renamed to 'json_schema_extra'
+```
+
+These warnings indicate that some Pydantic models in the codebase are still using V1 configuration keys that have been renamed in V2.
+
+### 4. Runtime Warning
+
+```
+<frozen runpy>:128: RuntimeWarning: 'app.main' found in sys.modules after import of package 'app', but prior to execution of 'app.main'; this may result in unpredictable behaviour
+```
+
+This warning is related to how the application is being started and might cause unpredictable behavior.
+
+## Solution Plan
+
+1. Fix the database check by updating the SQL query to use `text()`
+2. Make Redis connection more robust with better error handling
+3. Address the Pydantic V2 warnings (if possible without seeing the model files)
+4. Provide recommendations for the runtime warning
+
+## Implementation
+
+### 1. Fix Database Check in main.py
+
+Let's update the `perform_startup_checks` function in `main.py` to properly use `text()`:
+
+```python
+async def perform_startup_checks(app: FastAPI) -> None:
+    """Perform critical health checks on startup."""
+    checks = []
+    
+    # Check database
+    try:
+        from .database import get_db
+        from sqlalchemy import text
+        db = next(get_db())
+        db.execute(text("SELECT 1"))
+        db.close()
+        checks.append("Database: ✓")
+    except Exception as e:
+        logger.error(f"Database check failed: {e}")
+        checks.append("Database: ✗")
+    
+    # Check Redis
+    if app.state.cache.enabled:
+        try:
+            if await app.state.cache.ping():
+                checks.append("Redis: ✓")
+            else:
+                checks.append("Redis: ✗")
+        except Exception as e:
+            logger.warning(f"Redis check failed: {e}")
+            checks.append("Redis: ✗")
+    
+    # Check agent tools
+    if hasattr(app.state, 'agent'):
+        agent = app.state.agent
+        checks.append(f"Agent Tools: {len(agent.tools)}")
+    
+    logger.info(f"Startup checks: {', '.join(checks)}")
+```
+
+### 2. Improve Redis Connection Handling
+
+Let's update the cache service initialization in `main.py` to handle Redis connection issues more gracefully:
+
+```python
+# Initialize cache service
+logger.info("Initializing cache service...")
+cache_service = CacheService()
+app.state.cache = cache_service
+
+# Test cache connection with better error handling
+try:
+    if await cache_service.ping():
+        logger.info("✓ Cache service connected")
+    else:
+        logger.warning("✗ Cache service unavailable - running without cache")
+except Exception as e:
+    logger.warning(f"✗ Cache service unavailable - running without cache: {e}")
+```
+
+### 3. Address Pydantic V2 Warnings
+
+Without seeing the specific model files, I can provide a general recommendation:
+
+1. Find all Pydantic model classes that use `Config` class with `schema_extra`
+2. Replace `schema_extra` with `json_schema_extra`
+3. Find all Pydantic model classes that use `Config` class with `orm_mode`
+4. Replace `orm_mode` with `from_attributes`
+
+For example:
+```python
+# Before (Pydantic V1)
+class MyModel(BaseModel):
+    field: str
+    
+    class Config:
+        schema_extra = {"example": {"field": "value"}}
+        orm_mode = True
+
+# After (Pydantic V2)
+class MyModel(BaseModel):
+    field: str
+    
+    model_config = {
+        "json_schema_extra": {"example": {"field": "value"}},
+        "from_attributes": True
+    }
+```
+
+### 4. Runtime Warning Recommendation
+
+The runtime warning is related to how the application is being started. To avoid this warning, you can:
+
+1. Start the application using `uvicorn app.main:app` instead of `python -m app.main`
+2. Or, if you must use `python -m app.main`, ensure that the `app` package is not imported before running `app.main`
+
+## Complete Updated main.py File
+
+Here's the updated `main.py` file with the database check fix:
+
+```python
 """
 FastAPI application entry point with complete integration.
 """
@@ -309,3 +466,26 @@ if __name__ == "__main__":
         access_log=True,
         use_colors=True
     )
+```
+
+## Validation Steps
+
+1. Apply the changes to `main.py`
+2. Restart the application with `python -m app.main`
+3. Verify that the database check now passes
+4. Check that Redis connection errors are handled more gracefully
+5. Consider addressing the Pydantic V2 warnings in the model files
+6. Try starting the application with `uvicorn app.main:app` to avoid the runtime warning
+
+## Additional Recommendations
+
+1. For Redis, consider adding a configuration option to disable Redis completely if it's not available
+2. For the Pydantic V2 warnings, create a task to systematically update all model files
+3. Consider adding a startup configuration validation to catch these issues early
+
+With these changes, the application should start more cleanly and provide better error handling for Redis connection issues.
+
+---
+
+https://chat.z.ai/s/c740952c-ede3-49c5-a097-84562cbc1ea9
+
