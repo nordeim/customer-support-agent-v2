@@ -135,10 +135,77 @@ References synthesized from GEMINI overview, backend runtime report, backend bri
 
 ---
 
-If you want, I can now:
-- Produce a runnable checklist tailored to your specific infra (e.g., AWS EKS + RDS + ElastiCache), or
-- Generate a concrete tool template (BaseTool subclass + tests + registration steps) for integrating a CRM or billing API into the ChatAgent.
+### Updated findings from the three new documents
+
+#### Frontend build fixes and stability
+- **What changed**: The frontend repo was repaired: a missing tsconfig.node.json was added, 40+ TypeScript errors were fixed (types installed, duplicate exports removed, WebSocket typing corrected), and a dependency rollback (react-markdown / react-syntax-highlighter) resolved a Vite build failure so the app now builds reliably.  
+- **Key implication**: The frontend is now a stable artifact you can build reproducibly in CI/CD; integration risk from mismatched runtime types (WebSocket vs socket.io) has been addressed so runtime WebSocket behavior is predictable.
+
+#### Production Docker deployment plan
+- **What changed**: A comprehensive production Docker plan and artifacts were provided: multi-stage Dockerfiles (frontend builder + Python backend), Dockerfile for Nginx reverse proxy, docker-compose.prod.yml with PostgreSQL 17, Redis 7, ChromaDB persistence, volumes, healthchecks, and sample .env.docker; also deployment and backup scripts (deploy.sh, backup.sh), Nginx configs, and postgres init SQL were included.  
+- **Key implication**: There is a clear, runnable container topology and operational playbook for on‑prem or single-node Docker Compose deployments; it codifies volumes, healthchecks, and minimal hardening (non-root users, SSL placeholders) to accelerate environment bootstrap.
+
+#### Production backend configuration and DB hardening
+- **What changed**: Complete drop-in production-ready replacements for config.py and database.py were drafted that add: Pydantic v2 Settings with robust validators and secrets handling, PostgreSQL connection pooling (QueuePool) and event listeners, health / sanity checks, migration placeholders, extended Redis and Chroma configuration, telemetry toggles, and many production-tunable parameters (pool sizes, timeouts, TTLs, feature flags).  
+- **Key implication**: The backend now has explicit production defaults, secrets masking, and runtime self-checks; it also includes safer startup logic that attempts extension creation and per-table creation fallbacks to reduce first-run fragility.
 
 ---
 
-https://copilot.microsoft.com/shares/j2m9QbJzuNjUZUVkzHTmd
+### How these updates change adaptation strategy
+
+- **Start point is stronger**: With an operational production compose topology and hardened backend config, your initial adaptation effort can focus on domain integration and governance rather than basic infra gaps.  
+- **Frontend readiness reduces integration churn**: A stable, reproducible frontend build means fewer surprises when wiring Nginx, CSP, or CDN fronting and when instrumenting WebSocket health checks in production.  
+- **Operational artifacts accelerate onboarding**: deploy.sh, backup.sh, and healthchecks give you executable steps to integrate into CI/CD pipelines and runbooks; the config.py validators help detect misconfiguration early in automated tests.
+
+---
+
+### New or changed risks and mitigations
+
+- **Risk: Secrets and environment leakage in .env usage**  
+  - Mitigation: Replace .env.docker with secrets sourced from a managed secret store (HashiCorp Vault, Azure Key Vault, AWS Secrets Manager). Wire Pydantic to load from secure providers at runtime and ensure images do not contain plaintext .env templates.
+- **Risk: Single-node ChromaDB persistence and scaling**  
+  - Mitigation: Treat Chroma volume as ephemeral in Compose and plan migration to a managed/clustered vector store (or external Chroma service) before corpus growth; add monitored backup schedules (backup.sh) and automated restore tests.
+- **Risk: DB migration and first-run consistency**  
+  - Mitigation: Replace the placeholder migration routine with Alembic migrations executed as a controlled pre-deploy step; run migrations prior to service start to avoid per-node DDL race conditions; promote the current init logic to a bootstrap job only for development and CI.
+- **Risk: Dependency drift in frontend**  
+  - Mitigation: Lock dependency versions (package-lock.json / npm ci) and add a reproducible build step in CI that fails on emergent dependency breaks; include the changes that downgraded the syntax highlighter in a documented lockfile commit.
+
+---
+
+### Prioritized actionable checklist tuned to your scenario
+
+1. Immediate validation (local CI)
+   - [ ] Build frontend with CI pipeline using locked lockfile; run lint and typecheck; fail fast on type regressions.
+   - [ ] Run docker-compose.prod.yml locally (or in a disposable cloud VM) and validate /health endpoints for backend, Redis, Postgres, and Nginx.
+   - [ ] Run backend unit tests using the production settings (use a throwaway PostgreSQL instance) to expose pooling/timeouts early.
+
+2. Secrets and infra hardening
+   - [ ] Replace .env.docker with secrets managed by your secret store; update Pydantic Settings to read from environment variables injected by your orchestrator or entrypoint scripts.
+   - [ ] Configure PostgreSQL (RDS/Aurora/RDS Proxy or managed Postgres) and Redis (managed cache) for production; update DATABASE_URL and REDIS_URL accordingly in your deployment manifests.
+
+3. Persistence and backup
+   - [ ] Implement scheduled backups using the provided backup.sh but integrate snapshots to your cloud snapshots; test restore to a staging environment monthly.
+   - [ ] Plan ChromaDB migration path to a scalable vector store if expected corpus exceeds single-node capacity; instrument vector DB size and query latency metrics.
+
+4. Migrations and startup behavior
+   - [ ] Convert placeholder migration logic to Alembic (generate baseline migration from current models); run migrations in CI/CD before rolling updates to avoid table-creation at runtime.
+
+5. Observability and safety
+   - [ ] Wire OpenTelemetry or OTLP collector and Prometheus exporters as configured in the settings file; add structured request and tool-call logs with request_id and session_id correlation.
+   - [ ] Implement PII detection/redaction at ingestion and add escalation rules with logged audit trails; set automated alerts for high escalation rates or repeated RAG sources leakage attempts.
+
+6. Domain extension
+   - [ ] Implement domain-specific BaseTool(s) as pluggable modules and add contract tests that mock external API responses; register via the agent’s tool factory and guard with feature flags in settings.
+
+---
+
+### Minimal set of follow-up artifacts I can prepare next
+
+- Production-ready Kubernetes manifests (Deployment, StatefulSet for Postgres, Secret, ConfigMap with Pydantic env config pattern) and a Helm values template derived from docker-compose.prod.yml.  
+- An Alembic migration baseline and CI job that runs migrations and validates post-migration schema parity.  
+- A vetted BaseTool template (Python) with unit and integration test scaffolding that demonstrates a CRM connector integration with retry/backoff, auth, and table of audit logs.
+
+---
+
+https://copilot.microsoft.com/shares/cZKapp8Ee7rWExatfwppa (update)  
+https://copilot.microsoft.com/shares/j2m9QbJzuNjUZUVkzHTmd  
