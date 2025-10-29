@@ -1,0 +1,1 @@
+awesome understanding! now, please meticulously review a project's documents that I am going to share with you, 3 documents in total. Deeply analyze each document, then give me your comprehensive understanding and assessment of the project after receiving all three documents.
