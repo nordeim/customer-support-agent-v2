@@ -3,6 +3,8 @@
 # Test runner script with comprehensive checks
 # Usage: ./scripts/run_tests.sh [options]
 
+pip install pytest pytest-asyncio pytest-cov
+
 set -e  # Exit on error
 
 # Colors for output
