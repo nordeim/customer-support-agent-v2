@@ -63,6 +63,10 @@ pybreaker>=1.0.1  # Circuit breaker pattern
 #opentelemetry-api>=1.20.0  # OpenTelemetry instrumentation
 #opentelemetry-sdk>=1.20.0  # OpenTelemetry SDK
 
+# Phase 4 dependencies - Session State Externalization
+redis[asyncio]>=5.0.0  # Redis client with asyncio support
+hiredis>=2.2.3  # High-performance Redis parser
+
 # Utilities
 #pydantic==2.9.2
 #pydantic-settings==2.6.1
