@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  agent-1:
+    build: .
+    environment:
+      - USE_SHARED_CONTEXT=true
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  agent-2:
+    build: .
+    environment:
+      - USE_SHARED_CONTEXT=true
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - agent-1
+      - agent-2
+    networks:
+      - backend
+
+volumes:
+  redis_data:
+
+networks:
+  backend:
