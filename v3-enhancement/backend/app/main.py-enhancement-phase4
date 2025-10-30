@@ -1,0 +1,94 @@
+# backend/app/main.py (MINOR UPDATE for Session Store)
+Update the lifespan function to initialize session store:
+
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Manage application lifecycle events.
+    Initialize resources on startup, cleanup on shutdown.
+    """
+    # Startup
+    try:
+        logger.info("=" * 60)
+        logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+        logger.info(f"Environment: {settings.environment}")
+        logger.info("=" * 60)
+        
+        # Initialize database
+        logger.info("Initializing database...")
+        init_db()
+        
+        # Initialize cache service
+        logger.info("Initializing cache service...")
+        cache_service = CacheService()
+        app.state.cache = cache_service
+        
+        # Test cache connection with better error handling
+        try:
+            if await cache_service.ping():
+                logger.info("✓ Cache service connected")
+            else:
+                logger.warning("✗ Cache service unavailable - running without cache")
+        except Exception as e:
+            logger.warning(f"✗ Cache service unavailable - running without cache: {e}")
+        
+        # Initialize telemetry
+        if settings.enable_telemetry:
+            setup_telemetry(app)
+            logger.info("✓ Telemetry initialized")
+        
+        # Initialize the AI agent
+        logger.info("Initializing AI agent...")
+        agent = CustomerSupportAgent()
+        
+        # If using registry mode, initialize asynchronously
+        if agent.use_registry:
+            await agent.initialize_async()
+        
+        app.state.agent = agent
+        logger.info("✓ AI agent initialized successfully")
+        
+        # Add sample data to knowledge base
+        if settings.environment == "development":
+            await add_sample_knowledge(agent)
+        
+        # Perform startup health checks
+        await perform_startup_checks(app)
+        
+        logger.info("=" * 60)
+        logger.info("Application started successfully")
+        logger.info(f"API docs available at: http://{settings.api_host}:{settings.api_port}/docs")
+        logger.info("=" * 60)
+        
+    except Exception as e:
+        logger.error(f"Failed to start application: {e}", exc_info=True)
+        raise
+    
+    yield  # Application runs here
+    
+    # Shutdown
+    logger.info("=" * 60)
+    logger.info("Shutting down application...")
+    
+    try:
+        # Cleanup agent resources
+        if hasattr(app.state, 'agent'):
+            await app.state.agent.cleanup()
+            logger.info("✓ Agent cleanup complete")
+        
+        # Close cache connections
+        if hasattr(app.state, 'cache'):
+            await app.state.cache.close()
+            logger.info("✓ Cache connections closed")
+        
+        # Cleanup database
+        cleanup_db()
+        logger.info("✓ Database cleanup complete")
+        
+    except Exception as e:
+        logger.error(f"Error during shutdown: {e}")
+    
+    logger.info("Application shutdown complete")
+    logger.info("=" * 60)
+```
