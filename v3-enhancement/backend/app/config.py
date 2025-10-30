@@ -314,6 +314,46 @@ class Settings(BaseSettings):
         description="Tool initialization mode: 'legacy' or 'registry' (Phase 2+)"
     )
 
+    # ===========================
+    # Session Management Configuration (Phase 4)
+    # ===========================
+
+    use_shared_context: bool = Field(
+        default=False,
+        description="Use shared session context (Redis) for multi-instance deployments"
+    )
+
+    session_timeout_minutes: int = Field(
+        default=30,
+        ge=5,
+        le=1440,
+        description="Session timeout in minutes"
+    )
+
+    session_max_sessions: int = Field(
+        default=10000,
+        ge=100,
+        description="Maximum number of sessions (in-memory store only)"
+    )
+
+    session_cleanup_interval: int = Field(
+        default=300,
+        ge=60,
+        description="Interval for session cleanup in seconds"
+    )
+
+    # Redis Session Store Configuration (when use_shared_context=True)
+    redis_session_ttl: int = Field(
+        default=1800,
+        ge=300,
+        description="Redis session TTL in seconds"
+    )
+
+    redis_session_key_prefix: str = Field(
+        default="agent:session:",
+        description="Redis key prefix for sessions"
+    )
+    
     # Embedding Configuration
     embedding_model: str = Field(
         default="sentence-transformers/all-MiniLM-L6-v2",
