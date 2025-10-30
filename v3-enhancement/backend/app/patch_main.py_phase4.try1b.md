@@ -1,87 +1,189 @@
 # Phase 1: Request Analysis & Planning
 
 ## Executive Summary
-I will meticulously review the provided `session_store.py` file to verify that my previous updates to `main.py` correctly integrate with it. This is a critical validation step to ensure the session store implementation aligns with the initialization pattern I used.
+I will meticulously compare my generated `main.py` with the PR version to identify differences, analyze the architectural approaches, and determine which implementation is more appropriate for the session store integration.
 
 ## Deep Analysis & Deliberation
 
-### Current Session Store Analysis
-Reviewing the provided `session_store.py` file:
+### Key Architectural Differences
 
-1. **Abstract Base Class**: This is an abstract interface (`SessionStore`) that defines the contract for session storage implementations
-2. **SessionData Structure**: A well-defined dataclass for session data with serialization methods
-3. **Abstract Methods**: The `SessionStore` class defines abstract methods that must be implemented by concrete classes
-4. **No Concrete Implementation**: This file does not contain a concrete implementation of `SessionStore`
+**My Implementation Approach:**
+- Direct initialization of RedisSessionStore in main.py
+- Session store is a top-level component in app.state
+- Explicit Redis configuration handling in main.py
+- Separate session store health checks
 
-### Integration Issues Identified
+**PR Implementation Approach:**
+- Session store is initialized within the CustomerSupportAgent
+- Session store is accessed via agent.session_store
+- No explicit Redis configuration in main.py
+- Session store type is logged but not directly initialized in main.py
 
-**Critical Issue**: The `session_store.py` file contains only an abstract base class, not a concrete implementation. My previous `main.py` update assumed a concrete `SessionStore` class that could be instantiated directly.
+### Detailed Comparison
 
-### Solution Exploration
+#### 1. Session Store Initialization
+**My Implementation:**
+```python
+# Initialize session store
+session_store = None
+if REDIS_AVAILABLE:
+    logger.info("Initializing session store...")
+    try:
+        # Get Redis URL from settings or use default
+        redis_url = getattr(settings, 'redis_session_url', None)
+        # ... configuration handling ...
+        session_store = RedisSessionStore(...)
+        app.state.session_store = session_store
+```
 
-Based on the abstract nature of the provided file, I need to:
+**PR Implementation:**
+```python
+# Initialize the AI agent
+logger.info("Initializing AI agent...")
+agent = CustomerSupportAgent()
+# ... agent initialization ...
+app.state.agent = agent
+logger.info("✓ AI agent initialized successfully")
 
-1. **Identify the Concrete Implementation**: There must be a concrete implementation somewhere (e.g., `RedisSessionStore`, `DatabaseSessionStore`, etc.)
-2. **Update Import Path**: The import in `main.py` needs to point to the concrete implementation
-3. **Adjust Initialization**: The initialization might need different parameters or configuration
+# Log session store type
+session_store_type = type(agent.session_store).__name__
+logger.info(f"✓ Session store initialized: {session_store_type}")
+```
 
-### Risk Assessment
+#### 2. Session Store Access
+**My Implementation:**
+- Direct access via `app.state.session_store`
+- Session store is a top-level component
 
-- **High Risk**: Using the abstract class directly would cause runtime errors
-- **Medium Risk**: The concrete implementation might have different initialization requirements
-- **Low Risk**: The pattern of initialization should remain similar
+**PR Implementation:**
+- Access via `app.state.agent.session_store`
+- Session store is a component of the agent
+
+#### 3. Session Store Configuration
+**My Implementation:**
+- Explicit Redis configuration in main.py
+- Handles Redis URL construction from individual settings
+- Provides defaults for missing settings
+
+**PR Implementation:**
+- No explicit Redis configuration in main.py
+- Assumes agent handles its own session store configuration
+
+#### 4. Health Checks
+**My Implementation:**
+```python
+# Check session store
+if hasattr(app.state, 'session_store') and app.state.session_store is not None:
+    try:
+        if await app.state.session_store.ping():
+            checks.append("Session Store: ✓")
+        else:
+            checks.append("Session Store: ✗")
+    except Exception as e:
+        logger.warning(f"Session store check failed: {e}")
+        checks.append("Session Store: ✗")
+else:
+    checks.append("Session Store: ⚠ (disabled)")
+```
+
+**PR Implementation:**
+```python
+# Check session store
+session_store_type = type(agent.session_store).__name__
+checks.append(f"Session Store: {session_store_type}")
+
+# Check session store connection if Redis
+if session_store_type == "RedisSessionStore":
+    try:
+        if await agent.session_store.ping():
+            checks.append("Session Store Redis: ✓")
+        else:
+            checks.append("Session Store Redis: ✗")
+    except Exception as e:
+        logger.warning(f"Session Store Redis check failed: {e}")
+        checks.append("Session Store Redis: ✗")
+```
+
+#### 5. Root Endpoint
+**My Implementation:**
+- No session store information in root endpoint
+
+**PR Implementation:**
+```python
+session_store_type = "Unknown"
+session_stats = {}
+
+if hasattr(app.state, 'agent') and hasattr(app.state.agent, 'session_store'):
+    session_store_type = type(app.state.agent.session_store).__name__
+    try:
+        session_stats = await app.state.agent.session_store.get_stats()
+    except Exception as e:
+        logger.warning(f"Failed to get session stats: {e}")
+
+return {
+    # ... other fields ...
+    "session_store": session_store_type,
+    "session_stats": session_stats,
+    # ... other fields ...
+}
+```
+
+### Architectural Analysis
+
+**My Implementation (Top-Level Session Store):**
+- **Pros**: 
+  - Clear separation of concerns
+  - Session store can be used by multiple components
+  - Explicit configuration in main.py
+  - Easier to test and mock individual components
+- **Cons**:
+  - More complex initialization in main.py
+  - Requires explicit Redis configuration in settings
+
+**PR Implementation (Agent-Owned Session Store):**
+- **Pros**:
+  - Simpler main.py
+  - Session store is encapsulated within agent
+  - Agent manages its own session store configuration
+- **Cons**:
+  - Tighter coupling between agent and session store
+  - Harder to use session store outside of agent context
+  - Less visibility into session store configuration
+
+### Solution Recommendation
+
+Based on the analysis, the PR implementation is more aligned with the overall architecture of the application, where the session store is a component of the agent rather than a top-level service. This approach:
+
+1. Maintains the agent's encapsulation
+2. Simplifies the main.py initialization
+3. Follows the pattern of other components being initialized within their respective owners
+4. Allows the agent to manage its own session store configuration
+
+However, my implementation provides better visibility into the session store configuration and status, which could be valuable for debugging and monitoring.
 
 ## Execution Plan
 
-### Phase 1: Identify Correct Implementation
-1. Search for concrete SessionStore implementations
-2. Determine the correct import path
-3. Understand initialization requirements
+### Phase 1: Create Hybrid Implementation
+I'll create a hybrid approach that:
+1. Follows the PR's architecture (agent-owned session store)
+2. Adds better visibility into session store configuration
+3. Includes session store cleanup in shutdown
+4. Enhances error handling and logging
 
-### Phase 2: Update main.py
-1. Correct the import statement
-2. Adjust initialization if needed
-3. Ensure compatibility with the abstract interface
-
-### Phase 3: Validation
-1. Verify the concrete implementation matches expected interface
-2. Check initialization parameters
-3. Ensure cleanup methods are available
+### Phase 2: Enhance Session Store Integration
+1. Add session store cleanup in shutdown section
+2. Improve session store health checks
+3. Add session store configuration logging
+4. Enhance error handling for session store issues
 
 # Phase 2: Implementation
 
-## Critical Finding
-
-After reviewing the `session_store.py` file, I've identified a **critical integration issue**:
-
-The provided file contains only an **abstract base class** (`SessionStore`) and a `SessionData` dataclass. There is **no concrete implementation** that can be instantiated directly.
-
-## Problem with Previous Implementation
-
-My previous update to `main.py` attempted to:
-```python
-from .services.session_store import SessionStore
-session_store = SessionStore()  # This would fail!
-```
-
-This would fail because:
-1. `SessionStore` is an abstract class with abstract methods
-2. Cannot instantiate abstract classes directly
-3. Need a concrete implementation
-
-## Corrected Approach
-
-Since the abstract file doesn't provide a concrete implementation, I need to make an educated assumption about where the concrete implementation would be located. Based on common patterns in the codebase, it's likely one of:
-
-1. `RedisSessionStore` - for Redis-based session storage
-2. `DatabaseSessionStore` - for database-based session storage
-3. `MemorySessionStore` - for in-memory session storage
-
-Let me update `main.py` to handle this properly:
+Based on my analysis, I recommend adopting the PR's architecture with some enhancements from my implementation:
 
 ```python
 """
 FastAPI application entry point with complete integration.
+Phase 4: Session State Externalization with Redis support
 """
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,7 +191,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 import asyncio
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from .config import settings
 from .api.routes import chat, sessions, health
@@ -104,21 +206,6 @@ from .utils.middleware import (
 )
 from .database import init_db, cleanup_db
 from .services.cache_service import CacheService
-
-# Import session store - will handle concrete implementation selection
-try:
-    from .session.session_store import RedisSessionStore
-    SESSION_STORE_CLASS = RedisSessionStore
-except ImportError:
-    try:
-        from .session.session_store import DatabaseSessionStore
-        SESSION_STORE_CLASS = DatabaseSessionStore
-    except ImportError:
-        try:
-            from .session.session_store import MemorySessionStore
-            SESSION_STORE_CLASS = MemorySessionStore
-        except ImportError:
-            SESSION_STORE_CLASS = None
 
 # Configure structured logging
 logging.basicConfig(
@@ -136,8 +223,9 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Management application lifecycle events.
+    Manage application lifecycle events.
     Initialize resources on startup, cleanup on shutdown.
+    Phase 4: Initialize session store based on configuration.
     """
     # Startup
     try:
@@ -164,42 +252,6 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"✗ Cache service unavailable - running without cache: {e}")
         
-        # Initialize session store
-        session_store = None
-        if SESSION_STORE_CLASS is not None:
-            logger.info("Initializing session store...")
-            try:
-                # Initialize with appropriate parameters based on type
-                if SESSION_STORE_CLASS.__name__ == 'RedisSessionStore':
-                    session_store = SESSION_STORE_CLASS(
-                        host=getattr(settings, 'redis_host', 'localhost'),
-                        port=getattr(settings, 'redis_port', 6379),
-                        db=getattr(settings, 'redis_db', 0)
-                    )
-                elif SESSION_STORE_CLASS.__name__ == 'DatabaseSessionStore':
-                    session_store = SESSION_STORE_CLASS()
-                elif SESSION_STORE_CLASS.__name__ == 'MemorySessionStore':
-                    session_store = SESSION_STORE_CLASS()
-                else:
-                    session_store = SESSION_STORE_CLASS()
-                
-                app.state.session_store = session_store
-                
-                # Test session store connection
-                try:
-                    if hasattr(session_store, 'ping') and await session_store.ping():
-                        logger.info("✓ Session store connected")
-                    else:
-                        logger.warning("✗ Session store unavailable - running without session persistence")
-                except Exception as e:
-                    logger.warning(f"✗ Session store unavailable - running without session persistence: {e}")
-                    
-            except Exception as e:
-                logger.error(f"Failed to initialize session store: {e}")
-                session_store = None
-        else:
-            logger.warning("No session store implementation found - running without session persistence")
-        
         # Initialize telemetry
         if settings.enable_telemetry:
             setup_telemetry(app)
@@ -208,7 +260,7 @@ async def lifespan(app: FastAPI):
         # Initialize the AI agent
         logger.info("Initializing AI agent...")
         agent = CustomerSupportAgent()
-
+        
         # If using registry mode, initialize asynchronously
         if agent.use_registry:
             await agent.initialize_async()
@@ -218,6 +270,22 @@ async def lifespan(app: FastAPI):
         
         app.state.agent = agent
         logger.info("✓ AI agent initialized successfully")
+        
+        # Log session store type and configuration
+        session_store_type = type(agent.session_store).__name__
+        logger.info(f"✓ Session store initialized: {session_store_type}")
+        
+        # Log session store configuration for Redis
+        if session_store_type == "RedisSessionStore":
+            try:
+                redis_url = getattr(agent.session_store, 'redis_url', 'Unknown')
+                key_prefix = getattr(agent.session_store, 'key_prefix', 'Unknown')
+                default_ttl = getattr(agent.session_store, 'default_ttl', 'Unknown')
+                logger.info(f"  Redis URL: {redis_url}")
+                logger.info(f"  Key Prefix: {key_prefix}")
+                logger.info(f"  Default TTL: {default_ttl}s")
+            except Exception as e:
+                logger.warning(f"Failed to log session store configuration: {e}")
         
         # Add sample data to knowledge base
         if settings.environment == "development":
@@ -242,21 +310,10 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down application...")
     
     try:
-        # Cleanup agent resources
+        # Cleanup agent resources (includes session store cleanup)
         if hasattr(app.state, 'agent'):
             await app.state.agent.cleanup()
             logger.info("✓ Agent cleanup complete")
-        
-        # Close session store connections
-        if hasattr(app.state, 'session_store') and app.state.session_store is not None:
-            try:
-                if hasattr(app.state.session_store, 'close'):
-                    await app.state.session_store.close()
-                    logger.info("✓ Session store connections closed")
-                else:
-                    logger.info("✓ Session store cleanup complete (no close method)")
-            except Exception as e:
-                logger.warning(f"Error closing session store: {e}")
         
         # Close cache connections
         if hasattr(app.state, 'cache'):
@@ -297,34 +354,41 @@ async def perform_startup_checks(app: FastAPI) -> None:
         logger.error(f"Database check failed: {e}")
         checks.append("Database: ✗")
     
-    # Check Redis
+    # Check Redis (cache)
     if hasattr(app.state, 'cache') and app.state.cache.enabled:
         try:
             if await app.state.cache.ping():
-                checks.append("Redis: ✓")
+                checks.append("Redis Cache: ✓")
             else:
-                checks.append("Redis: ✗")
+                checks.append("Redis Cache: ✗")
         except Exception as e:
-            logger.warning(f"Redis check failed: {e}")
-            checks.append("Redis: ✗")
-    
-    # Check session store
-    if hasattr(app.state, 'session_store') and app.state.session_store is not None:
-        try:
-            if hasattr(app.state.session_store, 'ping') and await app.state.session_store.ping():
-                checks.append("Session Store: ✓")
-            else:
-                checks.append("Session Store: ✗")
-        except Exception as e:
-            logger.warning(f"Session store check failed: {e}")
-            checks.append("Session Store: ✗")
-    else:
-        checks.append("Session Store: ⚠ (disabled)")
+            logger.warning(f"Redis cache check failed: {e}")
+            checks.append("Redis Cache: ✗")
     
     # Check agent tools
     if hasattr(app.state, 'agent'):
         agent = app.state.agent
         checks.append(f"Agent Tools: {len(agent.tools)}")
+        
+        # Check session store
+        if hasattr(agent, 'session_store') and agent.session_store:
+            session_store_type = type(agent.session_store).__name__
+            checks.append(f"Session Store: {session_store_type}")
+            
+            # Check session store connection if Redis
+            if session_store_type == "RedisSessionStore":
+                try:
+                    if await agent.session_store.ping():
+                        checks.append("Session Store Redis: ✓")
+                    else:
+                        checks.append("Session Store Redis: ✗")
+                        logger.warning("Session store Redis connection failed")
+                except Exception as e:
+                    logger.warning(f"Session Store Redis check failed: {e}")
+                    checks.append("Session Store Redis: ✗")
+        else:
+            checks.append("Session Store: ✗")
+            logger.warning("Agent session store not available")
     
     logger.info(f"Startup checks: {', '.join(checks)}")
     
@@ -428,6 +492,16 @@ async def root() -> Dict[str, Any]:
     Returns:
         API information and status
     """
+    session_store_type = "Unknown"
+    session_stats = {}
+    
+    if hasattr(app.state, 'agent') and hasattr(app.state.agent, 'session_store'):
+        session_store_type = type(app.state.agent.session_store).__name__
+        try:
+            session_stats = await app.state.agent.session_store.get_stats()
+        except Exception as e:
+            logger.warning(f"Failed to get session stats: {e}")
+    
     return {
         "name": settings.app_name,
         "version": settings.app_version,
@@ -436,6 +510,8 @@ async def root() -> Dict[str, Any]:
         "docs": "/docs" if settings.debug else "disabled",
         "health": "/health",
         "metrics": "/metrics" if settings.enable_telemetry else "disabled",
+        "session_store": session_store_type,
+        "session_stats": session_stats,
         "stats": metrics_collector.get_stats()
     }
 
@@ -524,43 +600,59 @@ if __name__ == "__main__":
 
 # Phase 3: Validation & Refinement
 
-## Key Corrections Made
+## Key Enhancements Made
 
-1. **Dynamic Import Strategy**: Implemented a fallback import strategy that tries different concrete implementations:
-   - First tries `RedisSessionStore`
-   - Falls back to `DatabaseSessionStore`
-   - Finally tries `MemorySessionStore`
-   - Gracefully handles case where no implementation is found
+1. **Session Store Configuration Logging**:
+   - Added detailed logging of Redis session store configuration
+   - Logs Redis URL, key prefix, and TTL for better visibility
 
-2. **Flexible Initialization**: Added initialization logic that adapts to different session store types:
-   - Redis stores get connection parameters
-   - Database and memory stores use default initialization
-   - Handles cases where different stores need different parameters
+2. **Improved Health Checks**:
+   - Enhanced session store health checks with better error handling
+   - Added more descriptive status messages
+   - Distinguished between Redis cache and session store in checks
 
-3. **Robust Error Handling**: Enhanced error handling for session store:
-   - Graceful degradation if session store is unavailable
-   - Proper logging of initialization failures
-   - Safe cleanup that handles missing methods
+3. **Better Error Handling**:
+   - Added more robust error handling for session store operations
+   - Improved logging for session store issues
 
-4. **Updated Health Checks**: Modified startup checks to handle optional session store:
-   - Shows "disabled" status when no session store is available
-   - Safely checks for ping method before calling it
+4. **Maintained PR Architecture**:
+   - Kept the agent-owned session store approach
+   - Preserved the session store information in the root endpoint
+   - Maintained the agent cleanup which includes session store cleanup
 
 ## Quality Assurance Verification
 
-- [x] Correctly handles abstract nature of SessionStore interface
-- [x] Implements dynamic import strategy for concrete implementations
-- [x] Provides flexible initialization for different store types
-- [x] Gracefully handles missing session store implementations
+- [x] Follows the PR's architecture (agent-owned session store)
+- [x] Adds better visibility into session store configuration
+- [x] Maintains all existing functionality
+- [x] Improves error handling and logging
+- [x] Preserves the root endpoint enhancements
 - [x] Maintains backward compatibility
-- [x] Follows existing error handling patterns
-- [x] Proper logging and status reporting
 
 # Phase 4: Delivery & Knowledge Transfer
 
-## Critical Integration Issue Resolved
+## Recommended Implementation
 
-The updated `main.py` now
+I recommend using the hybrid implementation above, which combines the best aspects of both approaches:
+
+1. **Adopts PR Architecture**: Uses agent-owned session store for better encapsulation
+2. **Enhanced Visibility**: Adds detailed logging of session store configuration
+3. **Improved Error Handling**: Provides better error handling and logging
+4. **Maintains Functionality**: Preserves all existing functionality from the PR
+
+## Key Differences from PR
+
+1. **Configuration Logging**: Added detailed logging of Redis session store configuration
+2. **Enhanced Health Checks**: Improved session store health checks with better error handling
+3. **Better Error Messages**: More descriptive error messages and logging
+
+## Key Differences from My Original Implementation
+
+1. **Architecture**: Changed from top-level session store to agent-owned session store
+2. **Simplified Initialization**: Removed explicit Redis configuration from main.py
+3. **Session Store Access**: Changed from `app.state.session_store` to `app.state.agent.session_store`
+
+This hybrid approach provides the best of both worlds - the clean architecture of the PR with the enhanced visibility and error handling from my implementation.
 
 ---
 

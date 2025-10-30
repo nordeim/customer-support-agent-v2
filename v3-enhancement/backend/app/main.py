@@ -1,5 +1,6 @@
 """
 FastAPI application entry point with complete integration.
+Phase 4: Session State Externalization with Redis support
 """
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +23,6 @@ from .utils.middleware import (
 )
 from .database import init_db, cleanup_db
 from .services.cache_service import CacheService
-from .session.redis_session_store import RedisSessionStore, REDIS_AVAILABLE
 
 # Configure structured logging
 logging.basicConfig(
@@ -42,6 +42,7 @@ async def lifespan(app: FastAPI):
     """
     Manage application lifecycle events.
     Initialize resources on startup, cleanup on shutdown.
+    Phase 4: Initialize session store based on configuration.
     """
     # Startup
     try:
@@ -68,50 +69,6 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"✗ Cache service unavailable - running without cache: {e}")
         
-        # Initialize session store
-        session_store = None
-        if REDIS_AVAILABLE:
-            logger.info("Initializing session store...")
-            try:
-                # Get Redis URL from settings or use default
-                redis_url = getattr(settings, 'redis_session_url', None)
-                if not redis_url:
-                    # Try to construct from individual settings
-                    redis_host = getattr(settings, 'redis_host', 'localhost')
-                    redis_port = getattr(settings, 'redis_port', 6379)
-                    redis_db = getattr(settings, 'redis_session_db', 1)
-                    redis_password = getattr(settings, 'redis_password', None)
-                    
-                    if redis_password:
-                        redis_url = f"redis://:{redis_password}@{redis_host}:{redis_port}/{redis_db}"
-                    else:
-                        redis_url = f"redis://{redis_host}:{redis_port}/{redis_db}"
-                
-                # Initialize Redis session store
-                session_store = RedisSessionStore(
-                    redis_url=redis_url,
-                    key_prefix=getattr(settings, 'session_key_prefix', 'session:'),
-                    default_ttl=getattr(settings, 'session_ttl', 3600),
-                    max_connections=getattr(settings, 'session_max_connections', 10)
-                )
-                
-                app.state.session_store = session_store
-                
-                # Test session store connection
-                if await session_store.ping():
-                    logger.info("✓ Session store connected")
-                else:
-                    logger.warning("✗ Session store unavailable - running without session persistence")
-                    app.state.session_store = None
-                    session_store = None
-                    
-            except Exception as e:
-                logger.error(f"Failed to initialize session store: {e}")
-                session_store = None
-                app.state.session_store = None
-        else:
-            logger.warning("Redis not available for session store - running without session persistence")
-        
         # Initialize telemetry
         if settings.enable_telemetry:
             setup_telemetry(app)
@@ -120,7 +77,7 @@ async def lifespan(app: FastAPI):
         # Initialize the AI agent
         logger.info("Initializing AI agent...")
         agent = CustomerSupportAgent()
-
+        
         # If using registry mode, initialize asynchronously
         if agent.use_registry:
             await agent.initialize_async()
@@ -130,6 +87,10 @@ async def lifespan(app: FastAPI):
         
         app.state.agent = agent
         logger.info("✓ AI agent initialized successfully")
+        
+        # Log session store type
+        session_store_type = type(agent.session_store).__name__
+        logger.info(f"✓ Session store initialized: {session_store_type}")
         
         # Add sample data to knowledge base
         if settings.environment == "development":
@@ -158,14 +119,6 @@ async def lifespan(app: FastAPI):
         if hasattr(app.state, 'agent'):
             await app.state.agent.cleanup()
             logger.info("✓ Agent cleanup complete")
-        
-        # Close session store connections
-        if hasattr(app.state, 'session_store') and app.state.session_store is not None:
-            try:
-                await app.state.session_store.close()
-                logger.info("✓ Session store connections closed")
-            except Exception as e:
-                logger.warning(f"Error closing session store: {e}")
         
         # Close cache connections
         if hasattr(app.state, 'cache'):
@@ -206,34 +159,36 @@ async def perform_startup_checks(app: FastAPI) -> None:
         logger.error(f"Database check failed: {e}")
         checks.append("Database: ✗")
     
-    # Check Redis (cache)
+    # Check Redis
     if hasattr(app.state, 'cache') and app.state.cache.enabled:
         try:
             if await app.state.cache.ping():
-                checks.append("Redis Cache: ✓")
+                checks.append("Redis: ✓")
             else:
-                checks.append("Redis Cache: ✗")
+                checks.append("Redis: ✗")
         except Exception as e:
-            logger.warning(f"Redis cache check failed: {e}")
-            checks.append("Redis Cache: ✗")
-    
-    # Check session store
-    if hasattr(app.state, 'session_store') and app.state.session_store is not None:
-        try:
-            if await app.state.session_store.ping():
-                checks.append("Session Store: ✓")
-            else:
-                checks.append("Session Store: ✗")
-        except Exception as e:
-            logger.warning(f"Session store check failed: {e}")
-            checks.append("Session Store: ✗")
-    else:
-        checks.append("Session Store: ⚠ (disabled)")
+            logger.warning(f"Redis check failed: {e}")
+            checks.append("Redis: ✗")
     
     # Check agent tools
     if hasattr(app.state, 'agent'):
         agent = app.state.agent
         checks.append(f"Agent Tools: {len(agent.tools)}")
+        
+        # Check session store
+        session_store_type = type(agent.session_store).__name__
+        checks.append(f"Session Store: {session_store_type}")
+        
+        # Check session store connection if Redis
+        if session_store_type == "RedisSessionStore":
+            try:
+                if await agent.session_store.ping():
+                    checks.append("Session Store Redis: ✓")
+                else:
+                    checks.append("Session Store Redis: ✗")
+            except Exception as e:
+                logger.warning(f"Session Store Redis check failed: {e}")
+                checks.append("Session Store Redis: ✗")
     
     logger.info(f"Startup checks: {', '.join(checks)}")
     
@@ -337,6 +292,16 @@ async def root() -> Dict[str, Any]:
     Returns:
         API information and status
     """
+    session_store_type = "Unknown"
+    session_stats = {}
+    
+    if hasattr(app.state, 'agent') and hasattr(app.state.agent, 'session_store'):
+        session_store_type = type(app.state.agent.session_store).__name__
+        try:
+            session_stats = await app.state.agent.session_store.get_stats()
+        except Exception as e:
+            logger.warning(f"Failed to get session stats: {e}")
+    
     return {
         "name": settings.app_name,
         "version": settings.app_version,
@@ -345,6 +310,8 @@ async def root() -> Dict[str, Any]:
         "docs": "/docs" if settings.debug else "disabled",
         "health": "/health",
         "metrics": "/metrics" if settings.enable_telemetry else "disabled",
+        "session_store": session_store_type,
+        "session_stats": session_stats,
         "stats": metrics_collector.get_stats()
     }
 
