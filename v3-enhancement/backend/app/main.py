@@ -72,9 +72,19 @@ async def lifespan(app: FastAPI):
             setup_telemetry(app)
             logger.info("✓ Telemetry initialized")
         
+        # Replace the existing agent initialization code with:
+
         # Initialize the AI agent
         logger.info("Initializing AI agent...")
         agent = CustomerSupportAgent()
+
+        # If using registry mode, initialize asynchronously
+        if agent.use_registry:
+            await agent.initialize_async()
+        else:
+            # Legacy mode already initialized in __init__
+            pass
+        
         app.state.agent = agent
         logger.info("✓ AI agent initialized successfully")
         
