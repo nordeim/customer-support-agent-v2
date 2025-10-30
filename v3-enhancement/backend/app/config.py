@@ -305,7 +305,15 @@ class Settings(BaseSettings):
         default=3,
         description="Maximum retries for failed API calls"
     )
-    
+
+    # ===========================
+    # Agent Configuration (add to existing section)
+    # ===========================
+    agent_tool_registry_mode: str = Field(
+        default="legacy",
+        description="Tool initialization mode: 'legacy' or 'registry' (Phase 2+)"
+    )
+
     # Embedding Configuration
     embedding_model: str = Field(
         default="sentence-transformers/all-MiniLM-L6-v2",
