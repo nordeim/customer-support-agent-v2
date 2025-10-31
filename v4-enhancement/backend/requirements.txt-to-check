@@ -1,0 +1,55 @@
+# FastAPI and server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+
+# AI/ML - Embeddings
+sentence-transformers==2.2.2
+torch==2.1.0  # CPU version, use torch==2.1.0+cu118 for GPU
+
+# Vector Database
+chromadb==0.4.18
+
+# Redis (with async support)
+redis[asyncio]==5.0.1
+
+# Async HTTP client
+aiohttp==3.9.1
+
+# Circuit breaker (async-compatible)
+aiobreaker==1.2.0
+
+# Retry logic
+tenacity==8.2.3
+
+# File processing
+markitdown==0.0.1a2
+
+# OpenTelemetry (optional but recommended)
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+
+# Cryptography (for session encryption)
+cryptography==41.0.7
+
+# Python utilities
+python-dotenv==1.0.0
+python-jose[cryptography]==3.3.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Development
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
