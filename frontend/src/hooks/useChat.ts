@@ -50,11 +50,11 @@ export function useChat(options: UseChatOptions = {}) {
       setState((prev) => ({
         ...prev,
         session: {
-          id: session.sessionId,
-          userId: session.userId,
-          threadId: session.threadId,
+          id: session.session_id,
+          userId: session.user_id,
+          threadId: session.thread_id,
           status: session.status as any,
-          createdAt: session.createdAt,
+          createdAt: session.created_at,
           metadata: session.metadata,
         },
         isLoading: false,
@@ -62,7 +62,7 @@ export function useChat(options: UseChatOptions = {}) {
 
       // Connect WebSocket if auto-connect enabled
       if (autoConnect) {
-        websocket.connect(session.sessionId);
+        websocket.connect(session.session_id);
       }
 
       return session;

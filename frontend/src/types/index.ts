@@ -106,11 +106,11 @@ export interface ChatResponse {
 }
 
 export interface SessionResponse {
-  sessionId: string;
-  userId?: string;
-  threadId?: string;
+  session_id: string;
+  user_id?: string;
+  thread_id?: string;
   status: string;
-  createdAt: string;
+  created_at: string;
   metadata?: Record<string, any>;
 }
 
