@@ -27,49 +27,49 @@ The following diagram illustrates the flow of a user message through the system 
 
 ```mermaid
 graph TD
-    subgraph Frontend
-        A[User sends message via Chat Interface]
-    end
+  subgraph Frontend
+    A["User sends message via Chat Interface"]
+  end
 
-    subgraph Backend
-        B[FastAPI Backend]
-        C[API Route: /chat]
-        D[CustomerSupportAgent.process_message]
-        E[1. Load Context from Memory]
-        F[2. Process File Attachments]
-        G[3. Search Knowledge Base (RAG)]
-        H[4. Check for Escalation]
-        I[5. Generate Response]
-        J[6. Store New Memories]
-        K[AgentResponse Object]
-    end
+  subgraph Backend
+    B["FastAPI Backend"]
+    C["API Route: /chat"]
+    D["CustomerSupportAgent.process_message"]
+    E["Load Context from Memory"]
+    F["Process File Attachments"]
+    G["Search Knowledge Base (RAG)"]
+    H["Check for Escalation"]
+    I["Generate Response"]
+    J["Store New Memories"]
+    K["AgentResponse Object"]
+  end
 
-    subgraph Services
-        L[MemoryTool (SQLite/Postgres)]
-        M[AttachmentTool (File System)]
-        N[RAGTool (ChromaDB)]
-        O[EscalationTool]
-    end
+  subgraph Services
+    L["MemoryTool (SQLite/Postgres)"]
+    M["AttachmentTool (File System)"]
+    N["RAGTool (ChromaDB)"]
+    O["EscalationTool"]
+  end
 
-    A --> B;
-    B --> C;
-    C --> D;
-    D --> E;
-    E --> L;
-    D --> F;
-    F --> M;
-    M --> N;
-    D --> G;
-    G --> N;
-    D --> H;
-    H --> O;
-    D --> I;
-    I --> J;
-    J --> L;
-    I --> K;
-    K --> C;
-    C --> B;
-    B -- WebSocket/HTTP --> A;
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E --> L
+  D --> F
+  F --> M
+  M --> N
+  D --> G
+  G --> N
+  D --> H
+  H --> O
+  D --> I
+  I --> J
+  J --> L
+  I --> K
+  K --> C
+  C --> B
+  B -- "WebSocket/HTTP" --> A
 ```
 
 ## 3. File Hierarchy and Key Components
